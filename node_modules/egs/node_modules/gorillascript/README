@@ -1,0 +1,23 @@
+GorillaScript is a compile-to-JavaScript language designed to empower the user while attempting to prevent some common errors.
+
+To install:
+  sudo npm install -g gorillascript
+
+Run a script:
+  gorilla /path/to/script.gs
+
+Compile a script:
+  gorilla -c /path/to/script.gs
+
+More options:
+  gorilla --help
+
+For documentation, see http://ckknight.github.io/gorillascript/
+
+To suggest a feature or report a bug:
+http://github.com/ckknight/gorillascript/issues/
+
+If you have questions or would like to chat about GorillaScript, join us at #gorillascript on Freenode IRC or on http://webchat.freenode.net/?channels=gorillascript.
+
+Source repository:
+git://github.com/ckknight/gorillascript.git

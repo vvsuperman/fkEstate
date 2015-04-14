@@ -1,0 +1,23 @@
+{
+  "name": "public",
+  "version": "0.0.1",
+  "authors": [
+    "sqrtthree <sqrtthree@foxmail.com>"
+  ],
+  "description": "网站依赖的前端框架",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.2"
+  }
+}

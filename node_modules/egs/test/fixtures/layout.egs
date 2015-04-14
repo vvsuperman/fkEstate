@@ -1,0 +1,3 @@
+header[<% block header: %>Default header<% end %>]
+body[<% block body %>]
+footer[<% block footer: %>Default footer<% end %>]

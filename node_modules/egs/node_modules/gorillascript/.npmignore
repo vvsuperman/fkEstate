@@ -1,0 +1,6 @@
+*.js.bak
+node_modules
+test-js
+.DS_Store
+lib-cov
+coverage.html

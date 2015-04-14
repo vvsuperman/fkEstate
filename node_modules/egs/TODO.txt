@@ -1,0 +1,3 @@
+Ability to render static sites (like Jekyll)
+
+100% Coverage

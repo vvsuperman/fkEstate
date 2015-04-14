@@ -1,0 +1,11 @@
+<% extends "layout" %>
+
+Text is ignored once extends is used
+
+<% block body: %>Overridden body<% end%>
+
+Declared the body block before header, even though header will execute first.
+
+<% block header: %>Overridden header<% end %>
+
+This last part is still ignored.

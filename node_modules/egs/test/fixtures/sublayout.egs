@@ -1,0 +1,7 @@
+<% extends "layout" %>
+
+Any text outside of blocks is ignored
+
+<% block body: %>sub-body[<% block sub-body %>]<% end %>
+
+Also ignored

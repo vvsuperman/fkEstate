@@ -1,0 +1,28 @@
+egs is a library used to produce and render text templates that have embedded GorillaScript code in them.
+
+A template may look like something like this:
+
+  Dear <%= name %>,
+  
+  <%-- This is a comment, not rendered --%>
+  We regret to inform you that your son or daughter, <%= child-name %>
+  did not attend school today.
+  
+  <% if suspended: %>
+  We have no choice but to suspend your child until further notice.
+  <% end %>
+  
+        Sincerely,
+        <%= administrator-name %>
+
+Arbitrary code can be placed inside <% %> and text that is to be written inside <%= %>. These tokens can be customized.
+
+For documentation, see http://ckknight.github.com/egs/
+
+To suggest a feature or report a bug:
+http://github.com/ckknight/egs/issues/
+
+If you have questions or would like to chat about GorillaScript, join us at #gorillascript on Freenode IRC or on webchat.freenode.net.
+
+Source repository:
+git://github.com/ckknight/egs.git

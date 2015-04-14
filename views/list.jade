@@ -1,0 +1,37 @@
+extends layout
+
+block content
+  .container
+    .row
+      table.table.table-hover.table-border
+        thead
+          tr
+            th 电影名字
+            th 导演
+            th 国家
+            th 语言
+            th 上映年份
+            th 录入时间
+            th 查看
+            th 更新
+            th 删除
+        tbody
+          each item in movies
+            tr(class='item-id-#{item.id}')
+              td #{item.title}
+              td #{item.doctor}
+              td #{item.country}
+              td #{item.language}
+              td #{item.year}
+              td #{moment(item.meta.updatedAt).format('MM/DD/YYYY')}
+              td
+                a(target='_blank', href='/movie/#{item.id}', title='查看')
+                  i.glyphicon.glyphicon-link
+              td
+                a(target='_blank', href='/admin/update/#{item.id}', title='更新')
+                  i.glyphicon.glyphicon-edit
+              td
+                button.btn.btn-danger.del(type='button', data-id='#{item.id}') 删除
+
+block scripts
+  script(type="text/javascript", src="/javascripts/admin-list.js")

@@ -1,0 +1,35 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
+  body
+    nav.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
+      .container-fluid
+        .navbar-header
+          button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1')
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand(href='/') My videos
+        #bs-example-navbar-collapse-1.collapse.navbar-collapse
+          ul.nav.navbar-nav
+            li(class=(active=='index'? 'active': null))
+              a(href='/') 首页
+            li(class=(active=='movie'? 'active': null))
+              a(href='/admin/movie') 添加影片
+            li(class=(active=='list'? 'active': null))
+              a(href='/admin/list') 影片列表
+    .container
+      .row
+        .page-header
+          h1 #{title}
+            small 重度科幻迷
+
+    block content
+
+    script(type='text/javascript', src='/bower_components/jquery/dist/jquery.min.js')
+    script(type='text/javascript', src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
+    block scripts

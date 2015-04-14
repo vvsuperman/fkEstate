@@ -1,0 +1,11 @@
+<% extends "sublayout" %>
+
+Text is ignored once extends is used
+
+<% block sub-body: %>Overridden sub-body<% end%>
+
+Declared the sub-body block before header, even though header will execute first.
+
+<% block header: %>Overridden header<% end %>
+
+This last part is still ignored.
