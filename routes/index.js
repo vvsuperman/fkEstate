@@ -7,7 +7,7 @@ var underscore = require('underscore');
 var User = require('../models/user')
 
 var Cat = mongoose.model('Cat', { name: String });
-
+//服务器mongodb端口号为12345
 mongoose.connect('mongodb://localhost:27017/yoouda');
 
 
@@ -16,14 +16,22 @@ router.get('/', function(req, res) {
 	// Movie.fetch(function(error, movies) {
 	// 	if (error) console.log(error);
 
-	// 	res.render('index', { 
-			
+	// 	res.render('index', {
+
 	// 		//active: 'index'
 	// 		// movies: movies
 	// 	});
 	// });
 });
 
+router.get('/admin',function(req,res) {
+    User.fetch(function(error, users) {
+        if (error) console.log(error);
+        res.render('admin',{
+            users:users
+        });
+    });
+});
 
 router.post('/userneed/new',function(req,res){
     var _user;

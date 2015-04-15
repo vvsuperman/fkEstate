@@ -1,16 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title></title>
-    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+{{#section 'head'}} {{!块级Helper需要加#}}
     <link rel="stylesheet" href="/css/index.css">
-    <script src="/bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="/javascripts/index.js"></script>
-</head>
-<body>
+{{/section}}
+
 <div class="container-fluid">
     <div class="row clearfix">
         <nav class="navbar navbar-default" role="navigation">
@@ -44,12 +35,12 @@
             <tbody>
             <tr>
                 <td style="height: 500px;">
-                    <div>
+                    <div style="text-align: center">
                         <p style="font-size: 5em">师徒汇-回归教育的<span style="color:#00CC00">本质</span></p>
                         <p style="font-size: 2em;">答疑、授业、解惑 人人都需要好导师</p>
                     </div>
                 </td>
-                </tr>
+            </tr>
             </tbody>
         </table>
     </div>
@@ -392,5 +383,6 @@
 </div>
 <!-- /.modal -->
 
-</body>
-</html>
+{{#section 'body'}}
+{{/section}}
+

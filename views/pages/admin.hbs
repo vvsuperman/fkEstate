@@ -1,0 +1,77 @@
+{{#section 'head'}} {{!块级Helper需要加#}}
+{{/section}}
+
+<div class="container-fluid">
+    <div class="row clearfix">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#" style="">师徒汇</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-3">
+            <div class="panel-group" id="panel-711554">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-711554" href="#panel-element-372997">用户信息</a>
+                    </div>
+                    <div id="panel-element-372997" class="panel-collapse collapse in">
+                        <div class="panel-body" id="userInfo">
+                            用户列表
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-711554" href="#panel-element-130462">其它</a>
+                    </div>
+                    <div id="panel-element-130462" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            其它
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>邮箱</th>
+                        <th>专业</th>
+                        <th>学历</th>
+                        <th>方式</th>
+                        <th>意向</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each users}}
+                    <tr>
+                        <td>{{email}}</td>
+                        <td>{{domain}}</td>
+                        <td>{{level}}</td>
+                        <td>{{method}}</td>
+                        <td>{{area}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{{#section 'body'}}
+{{/section}}
+
