@@ -1,0 +1,53 @@
+
+> yoouda@0.0.1 start /Users/fw/Documents/prosky/yoouda
+> node ./bin/www
+
+[Error: Module version mismatch. Expected 47, got 14.]
+js-bson: Failed to load c++ bson extension, using pure JS version
+[33m
+##############################################################
+#
+#   !!! MONGOOSE WARNING !!!
+#
+#   This is an UNSTABLE release of Mongoose.
+#   Unstable releases are available for preview/testing only.
+#   DO NOT run this in production.
+#
+##############################################################
+[0m
+Server running at http://localhost:3000
+events.js:141
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: failed to connect to [localhost:12345]
+    at null.<anonymous> (/Users/fw/Documents/prosky/yoouda/node_modules/mongoose/node_modules/mongodb/lib/mongodb/connection/server.js:549:25)
+    at emitThree (events.js:97:13)
+    at emit (events.js:175:7)
+    at null.<anonymous> (/Users/fw/Documents/prosky/yoouda/node_modules/mongoose/node_modules/mongodb/lib/mongodb/connection/connection_pool.js:150:15)
+    at emitTwo (events.js:87:13)
+    at emit (events.js:172:7)
+    at Socket.<anonymous> (/Users/fw/Documents/prosky/yoouda/node_modules/mongoose/node_modules/mongodb/lib/mongodb/connection/connection.js:533:10)
+    at emitOne (events.js:77:13)
+    at Socket.emit (events.js:169:7)
+    at emitErrorNT (net.js:1253:8)
+
+npm ERR! Darwin 14.5.0
+npm ERR! argv "/usr/local/bin/node" "/usr/local/bin/npm" "start"
+npm ERR! node v5.0.0
+npm ERR! npm  v3.3.6
+npm ERR! code ELIFECYCLE
+npm ERR! yoouda@0.0.1 start: `node ./bin/www`
+npm ERR! Exit status 1
+npm ERR! 
+npm ERR! Failed at the yoouda@0.0.1 start script 'node ./bin/www'.
+npm ERR! This is most likely a problem with the yoouda package,
+npm ERR! not with npm itself.
+npm ERR! Tell the author that this fails on your system:
+npm ERR!     node ./bin/www
+npm ERR! You can get their info via:
+npm ERR!     npm owner ls yoouda
+npm ERR! There is likely additional logging output above.
+
+npm ERR! Please include the following file with any support request:
+npm ERR!     /Users/fw/Documents/prosky/yoouda/npm-debug.log

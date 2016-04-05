@@ -3,35 +3,85 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var Movie = require('../models/movie');
 var underscore = require('underscore');
+var request = require('request');
+var User = require('../models/user');
+var http = require("http");
 
-var User = require('../models/user')
+
+
 
 var Cat = mongoose.model('Cat', { name: String });
 //服务器mongodb端口号为12345
-mongoose.connect('mongodb://localhost:27017/yoouda');
+mongoose.connect('mongodb://localhost:12345/yoouda');
 
 
 router.get('/', function(req, res) {
-	res.render("index");
-	// Movie.fetch(function(error, movies) {
-	// 	if (error) console.log(error);
-
-	// 	res.render('index', {
-
-	// 		//active: 'index'
-	// 		// movies: movies
-	// 	});
-	// });
+	res.render("index");	
 });
 
-router.get('/admin',function(req,res) {
-    User.fetch(function(error, users) {
-        if (error) console.log(error);
-        res.render('admin',{
-            users:users
-        });
+router.get('/genFangData',function(req,res){
+	
+	//上海所有的行政区
+	var region =[{"name":"pudong","num":34},{"name":"minhang","num":14},
+	,{"name":"xuhui":"num":16},{"name":"putuo","num":10},{"name":"changning","num":15},
+	{"name":"jingan","num":10},{"name":"huangpu","num":8},{"name":"luwan","num":7},
+	{"name":"hongkou","num":14},{"name":"zhabei","num":10},{"name":"yangpu","num":14},
+	{"name":"baoshan","num":9},{"name":"songjiang","num":9},{"name":"jiading","num":9},
+	{"name":"qingpu","num":5}];
+	
+	
+	var baseUrl = "http://www.anjuke.com/shanghai/cm/";
+	
+	var testUrl = "http://www.anjuke.com/shanghai/cm/pudong/p2/";
+
+//  region.forEach(function(district){
+//  	    //区域有分页，循环分页
+//	    	for(var i =0 ;i < district.num ;i++){
+//  	   	   (function(){
+//              var temp = i;
+//              var url = baseUrl + district.name +"/p"+temp+"/";
+//              
+//             	request(url, function (error, response, body) {  		
+//				    if (!error && response.statusCode == 200) {
+//				        console.log(body); 
+//				        body.indexOf("<P3>");
+//				    }
+//			    });
+//  	   	   })
+//	    	}    	      	  
+//  })
+
+	request(testUrl, function (error, response, body) {
+	    if (!error && response.statusCode == 200) {
+	        var i = body.indexOf("P3");
+	        var j = body.indexOf("P4");
+	        var a = body.slice(i, j);
+	        console.log(a);
+	    }
     });
-});
+	
+
+
+
+	
+//	for(key in region){
+//		var num = regin[key];
+//		for(var i = 0 ; i < num ; i ++){
+//			var url = "http://www.anjuke.com/shanghai/cm/"+key+"/p"+i+"/";
+//			request.get(url)
+//				   .on('response', function(response) {
+//				    
+//				  })
+//		}
+//		
+//		
+//	}
+	
+	
+	//根据行政区得到小区
+	
+	
+})
 
 router.post('/userneed/new',function(req,res){
     var _user;
@@ -49,11 +99,6 @@ router.post('/userneed/new',function(req,res){
 
     });
 
-    var kitty = new Cat({ name: 'Zildjian' });
-	kitty.save(function (err) {
-	  if (err) // ...
-	  console.log('meow');
-	});
   
 });
 
