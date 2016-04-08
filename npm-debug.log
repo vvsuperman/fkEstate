@@ -1,38 +1,45 @@
 0 info it worked if it ends with ok
-1 verbose cli [ 'F:\\ProgramFiles\\nodejs\\\\node.exe',
-1 verbose cli   'F:\\ProgramFiles\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
-1 verbose cli   'start' ]
-2 info using npm@2.5.1
-3 info using node@v0.12.0
-4 verbose node symlink F:\ProgramFiles\nodejs\\node.exe
-5 verbose run-script [ 'prestart', 'start', 'poststart' ]
-6 info prestart yoouda@0.0.1
-7 info start yoouda@0.0.1
-8 verbose unsafe-perm in lifecycle true
-9 info yoouda@0.0.1 Failed to exec start script
-10 verbose stack Error: yoouda@0.0.1 start: `node ./bin/www`
-10 verbose stack Exit status 1
-10 verbose stack     at EventEmitter.<anonymous> (F:\ProgramFiles\nodejs\node_modules\npm\lib\utils\lifecycle.js:213:16)
-10 verbose stack     at EventEmitter.emit (events.js:110:17)
-10 verbose stack     at ChildProcess.<anonymous> (F:\ProgramFiles\nodejs\node_modules\npm\lib\utils\spawn.js:14:12)
-10 verbose stack     at ChildProcess.emit (events.js:110:17)
-10 verbose stack     at maybeClose (child_process.js:1008:16)
-10 verbose stack     at Process.ChildProcess._handle.onexit (child_process.js:1080:5)
-11 verbose pkgid yoouda@0.0.1
-12 verbose cwd G:\IPO\yoouda
-13 error Windows_NT 6.1.7601
-14 error argv "F:\\ProgramFiles\\nodejs\\\\node.exe" "F:\\ProgramFiles\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "start"
-15 error node v0.12.0
-16 error npm  v2.5.1
-17 error code ELIFECYCLE
-18 error yoouda@0.0.1 start: `node ./bin/www`
-18 error Exit status 1
-19 error Failed at the yoouda@0.0.1 start script 'node ./bin/www'.
-19 error This is most likely a problem with the yoouda package,
-19 error not with npm itself.
-19 error Tell the author that this fails on your system:
-19 error     node ./bin/www
-19 error You can get their info via:
-19 error     npm owner ls yoouda
-19 error There is likely additional logging output above.
-20 verbose exit [ 1, true ]
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'start' ]
+2 info using npm@3.6.0
+3 info using node@v5.7.0
+4 verbose run-script [ 'prestart', 'start', 'poststart' ]
+5 info lifecycle yoouda@0.0.1~prestart: yoouda@0.0.1
+6 silly lifecycle yoouda@0.0.1~prestart: no script for prestart, continuing
+7 info lifecycle yoouda@0.0.1~start: yoouda@0.0.1
+8 verbose lifecycle yoouda@0.0.1~start: unsafe-perm in lifecycle true
+9 verbose lifecycle yoouda@0.0.1~start: PATH: /usr/local/lib/node_modules/npm/bin/node-gyp-bin:/Users/fw/Documents/teacher/projects/map/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/mongodb/bin
+10 verbose lifecycle yoouda@0.0.1~start: CWD: /Users/fw/Documents/teacher/projects/map
+11 silly lifecycle yoouda@0.0.1~start: Args: [ '-c', 'node ./bin/www' ]
+12 silly lifecycle yoouda@0.0.1~start: Returned: code: 1  signal: null
+13 info lifecycle yoouda@0.0.1~start: Failed to exec start script
+14 verbose stack Error: yoouda@0.0.1 start: `node ./bin/www`
+14 verbose stack Exit status 1
+14 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:232:16)
+14 verbose stack     at emitTwo (events.js:100:13)
+14 verbose stack     at EventEmitter.emit (events.js:185:7)
+14 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:24:14)
+14 verbose stack     at emitTwo (events.js:100:13)
+14 verbose stack     at ChildProcess.emit (events.js:185:7)
+14 verbose stack     at maybeClose (internal/child_process.js:827:16)
+14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:211:5)
+15 verbose pkgid yoouda@0.0.1
+16 verbose cwd /Users/fw/Documents/teacher/projects/map
+17 error Darwin 14.5.0
+18 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "start"
+19 error node v5.7.0
+20 error npm  v3.6.0
+21 error code ELIFECYCLE
+22 error yoouda@0.0.1 start: `node ./bin/www`
+22 error Exit status 1
+23 error Failed at the yoouda@0.0.1 start script 'node ./bin/www'.
+23 error Make sure you have the latest version of node.js and npm installed.
+23 error If you do, this is most likely a problem with the yoouda package,
+23 error not with npm itself.
+23 error Tell the author that this fails on your system:
+23 error     node ./bin/www
+23 error You can get information on how to open an issue for this project with:
+23 error     npm bugs yoouda
+23 error Or if that isn't available, you can get their info via:
+23 error     npm owner ls yoouda
+23 error There is likely additional logging output above.
+24 verbose exit [ 1, true ]

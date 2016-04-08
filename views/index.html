@@ -19,13 +19,58 @@ body{height:100%;margin:0px;padding:0px}
  
 <body>  
 	
+	
+
+
+<button type="submit" id="testBtn">测试提交</button>	
+<button type="submit" id="testXy">测试经纬度</button>
+
+<script type="text/javascript">
+  $("#testBtn").click(function(){
+  	  $.get("genFangData",function(data){
+  	  	console.log(data);
+  	  });
+  })
+  
+  $("#testXy").click(function(){
+  	var options = {      
+      onSearchComplete: function(results){      
+          if (local.getStatus() == BMAP_STATUS_SUCCESS){      
+                // 判断状态是否正确      
+                    
+//              for (var i = 0; i < results.getCurrentNumPois(); i ++){      
+//                  s.push(results.getPoi(i).title + ", " + results.getPoi(i).address);
+//                  console.log(s);
+//              }      
+                var x = results.getPoi(0).point.lat;
+                var y = results.getPoi(0).point.lng;
+                var point = new BMap.Point(y, x);  
+                var marker = new BMap.Marker(point);        // 创建标注    
+			    map.addOverlay(marker);                     // 将标注添加到地图中 
+                map.centerAndZoom(point,15);
+               
+                 
+          }      
+      }      
+ 	}; 
+ 	
+ 	var local = new BMap.LocalSearch(map, options);      
+	local.search("建新小区");
+  	
+  })
+  
+       
+
+ 
+</script>
+	
 <div id="container"></div> 
 <script type="text/javascript"> 
 
 
 
 
-var map = new BMap.Map("container");          // 创建地图实例  
+map = new BMap.Map("container");          // 创建地图实例  
 // 初始化地图，设置中心点坐标和地图级别  
 map.addControl(new BMap.NavigationControl());    
 map.addControl(new BMap.ScaleControl());    
@@ -43,6 +88,8 @@ map.centerAndZoom("上海",15);
 // marker.addEventListener("dragend", function(e){    
 //  alert("当前位置：" + e.point.lng + ", " + e.point.lat);    
 // })
+
+    
 
 
 // 定义自定义覆盖物的构造函数  

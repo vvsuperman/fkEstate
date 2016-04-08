@@ -21,9 +21,11 @@ router.get('/', function(req, res) {
 
 router.get('/genFangData',function(req,res){
 	
+	console.log("genFangData.............");
+	
 	//上海所有的行政区
 	var region =[{"name":"pudong","num":34},{"name":"minhang","num":14},
-	,{"name":"xuhui":"num":16},{"name":"putuo","num":10},{"name":"changning","num":15},
+	,{"name":"xuhui","num":16},{"name":"putuo","num":10},{"name":"changning","num":15},
 	{"name":"jingan","num":10},{"name":"huangpu","num":8},{"name":"luwan","num":7},
 	{"name":"hongkou","num":14},{"name":"zhabei","num":10},{"name":"yangpu","num":14},
 	{"name":"baoshan","num":9},{"name":"songjiang","num":9},{"name":"jiading","num":9},
@@ -56,9 +58,16 @@ router.get('/genFangData',function(req,res){
 	        var i = body.indexOf("P3");
 	        var j = body.indexOf("P4");
 	        var a = body.slice(i, j);
-	        console.log(a);
+	       
+//	         var reg = /[\u4E00-\u9FA5\uF900-\uFA2D]{2,10}$/g ;
+             var reg = /[\u4e00-\u9fa5]{2,20}/g ;  //匹配所有的中文
+             console.log(a.match(reg));
 	    }
     });
+    
+   
+    
+    
 	
 
 

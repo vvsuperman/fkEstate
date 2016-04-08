@@ -13,11 +13,24 @@ body{height:100%;margin:0px;padding:0px}
 //v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
 //v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"
 </script>
+
+<link rel="stylesheet" href="public/bower_components/bootstrap/dist/css/bootstrap.css" />
+<script type ="text/javascript" src="public/bower_components/jquery/dist/jquery.min.js"></script>
+
 </head>  
  
 <body>  
+
+<script type="text/javascript">
+  ("#testBtn").click(function(){
+  	  $.get("genFangData");
+  })
+ 
+</script>
+<button type="submit" id="testBtn">测试提交</button>		
+
 <div id="container"></div> 
-<script type="text/javascript"> 
+<!--<script type="text/javascript"> 
 var map = new BMap.Map("container");          // 创建地图实例  
 // 初始化地图，设置中心点坐标和地图级别  
 map.addControl(new BMap.NavigationControl());    
@@ -92,6 +105,6 @@ map.addOverlay(mySquare);
 
 
 
-</script>  
+</script>  -->
 </body>  
 </html>
