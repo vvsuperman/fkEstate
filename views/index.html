@@ -22,7 +22,9 @@ body{height:100%;margin:0px;padding:0px}
 	
 
 
-<button type="submit" id="testBtn">测试提交</button>	
+<button type="submit" id="testBtn">生成所有小区</button>	
+<button type="submit" id="genPrice">生成小区房价</button>
+
 <button type="submit" id="testXy">测试经纬度</button>
 
 <script type="text/javascript">
@@ -31,6 +33,18 @@ body{height:100%;margin:0px;padding:0px}
   	  	console.log(data);
   	  });
   })
+  
+  $("#genPrice").click(function(){
+  	console.log("price click..");
+  	$.get("genFangPrice",function(data){
+  		console.log(data);
+  	});
+  })
+  
+  
+ 
+  
+  
   
   $("#testXy").click(function(){
   	var options = {      
