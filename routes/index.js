@@ -16,7 +16,7 @@ var httpinvoke = require('httpinvoke');
 
 var Cat = mongoose.model('Cat', { name: String });
 
-
+var priceUrl ="http://sh.fangjia.com/trend/yearData?defaultCityName=上海&block=&keyword=&__ajax=1&districtName=";//=建新小区&region=杨浦
 
 var region =[{"name":"pudong","cname":"浦东","num":34},{"name":"minhang","cname":"闵行","num":14},
 	,{"name":"xuhui","cname":"徐汇","num":16},{"name":"putuo","cname":"普陀","num":10},{"name":"changning","cname":"长宁","num":15},
@@ -82,64 +82,73 @@ router.get('/genFangData',function(req,res){
               	
 })
 
+
+var getPriceAndSave = function(pZone) {
+	
+	    var pUrl = encodeURI(priceUrl + pZone.name + "&region=" + district[pZone.district]);
+		
+		console.log("get url........",pUrl);									
+		
+		httpinvoke(pUrl, 'GET', function(err, body, statusCode, headers) {
+
+				if (err) {
+					return console.log('Failure', err);
+				}
+				console.log("get price........")
+					//body也不规范，需要先转化好	    
+				var series = (JSON.parse(body)).series;				
+
+				//如果小区有房价
+				if (series.length != 0) {
+
+					var prices = series[0].data;
+
+					for (i in prices) {
+
+						var zonePrice = new ZonePrice({
+							zone: pZone._id,
+							time: prices[i][0],
+							price: prices[i][1]
+
+						});
+
+						zonePrice.save(function(error, pZonePrice) {
+							if (error) console.log(error);
+
+						});
+
+					}
+				}
+		}) //http invoke
+		
+} //getpriceandsave
+
+
 router.get('/genFangPrice',function(req,res){
 	
-	var priceUrl ="http://sh.fangjia.com/trend/yearData?defaultCityName=上海&block=&keyword=&__ajax=1&districtName=";//=建新小区&region=杨浦
+	
 	
 	Zone.find({},function(err, zones){
+		
 		console.log("find zone......");
-//		zones.forEach(function(pZone){
-//			
-//			  	var pUrl = priceUrl+ pZone.name+"&region="+district[pZone.district];
-//			  				  				    
-//			    request(pUrl,function (error, response, body) {
-//			    		
-//			    		 if (!error && response.statusCode == 200) {		
-//			    		     var priceData = body.series[0].data
-//			    		     
-//			    		     for(var i=0; i<priceData.length; i++){
-//			    		     	 
-//			    		     	 var zonePrice = new ZonePrice({								    		    
-//					    		    zone: pZone._id,
-//					    		    time: priceData[i][0],
-//					    		    price: priceData[i][1]
-//					    		    
-//					    	     });
-//					    	     
-//					    	     zonePrice.save(function(error,pZonePrice){
-//					    	     	 if (error) console.log(error);
-//					    	     	 
-//					    	     });
-//			    		     }					    		 
-//			    		 }						    		
-//			    	})	
-//			
-//		})
-
-             var testUrl = "http://sh.fangjia.com/trend/yearData?defaultCityName=上海&block=&keyword=&__ajax=1&districtName=建新小区&region=杨浦";
-             
-             var testUrl2 = "http://www.imooc.com/course/list?c=fe";
-             
-             var testUrl3 = "http://sh.fangjia.com/trend/yearData?defaultCityName=%E4%B8%8A%E6%B5%B7&districtName=%E9%87%91%E6%9D%A8%E6%96%B0%E6%9D%91&region=%E6%B5%A6%E4%B8%9C&block=&keyword=&__ajax=1# fkEstate";
-             
-             //request库得不到数据， http库直接报错，初步判断原因是header头不规范。需要将url中的中文进行转义，转义完毕后才可以访问。
-             httpinvoke(testUrl3, 'GET', function(err, body, statusCode, headers) {
-			    if(err) {
-			        return console.log('Failure', err);
-			    }
-			    console.log('Success', body);
-			});
-             
-//		     request(testUrl,function(err, response, body){
-//		      	console.log("body.........",body);
-//		        console.log("response.........",response);
-//		     })
-
-			//http modal 获取数据包解析报错
+		
+		zones.forEach(function(pZone){
+			  		
+		   getPriceAndSave(pZone);
+		
+		
+					
+				
+			  
+		//request库得不到数据， http库直接报错，初步判断原因是header头不规范。需要将url中的中文进行转义，转义完毕后才可以访问。
+			  	;			  				  					
+		})// for each
+		
 
 	})
 	
 })
+
 
 
 
