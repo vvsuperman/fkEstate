@@ -10,6 +10,9 @@ var http = require("http");
 var ZonePrice = require('../models/zonePrice');
 var unirest = require('unirest');
 var httpinvoke = require('httpinvoke');
+var Schema = mongoose.Schema;
+var ObjectId = Schema.Types.ObjectId;
+var pageSize = 10; //每页十条记录
 
 
 
@@ -39,9 +42,57 @@ router.get('/', function(req, res) {
 	res.render("index");	
 });
 
+
+
+//根据房价增长率倒序排列小区名
+router.post('/getZoneByPrice',function(req,res){
+	//分页的起始页
+	
+	console.log("getzone by price");
+	var pageNum = req.body.pageNum;
+	
+	//按照pricerate的倒序排列	
+	Zone.find({})
+	    .where("priceRate").gt(0)
+	    .sort({"priceRate":-1})
+	    .skip((pageNum-1)*pageSize)
+	    .limit(pageSize)
+	    .exec(function(err,zones){
+	    	  
+	    	   var length= zones.length;
+	    	   var zoneNum =0;
+	    	   if(err!=null) console.log(err);
+	    	   //获取每一个小区的房价,并倒序排列
+	    	   
+	    	   for(var i=0;i<length;i++){
+	    	   	  (function(i){
+	    	   	  	
+	    	   	  	 ZonePrice.find({"zone":zones[i]},function(err, zoneprices){	  		      
+	  		            zones[i].zonePrices = zoneprices;	  		         	         	
+	  		         	//获取全部数据了才能返回
+			  		    if(++zoneNum == length){			  			  
+		  	  			   res.json({
+								     state:0,
+								     zones:zones
+				        	    	
+				        	    });
+					  	}		  		
+		  		})
+	    	   	  })(i)
+	    	   	      
+	    	   	
+	    	   }
+	  	  
+	  	  
+	  	  
+        })
+	
+})
+
+
 router.get('/genFangData',function(req,res){
 	
-	console.log("genFangData.............");
+	
 	
 	//上海所有的行政区			
 	var baseUrl = "http://www.anjuke.com/shanghai/cm/";
@@ -86,25 +137,22 @@ router.get('/genFangData',function(req,res){
 var getPriceAndSave = function(pZone) {
 	
 	    var pUrl = encodeURI(priceUrl + pZone.name + "&region=" + district[pZone.district]);
-		
-		console.log("get url........",pUrl);									
-		
+												
+		//request库得不到数据， http库直接报错，初步判断原因是header头不规范。需要将url中的中文进行转义，转义完毕后才可以访问。
 		httpinvoke(pUrl, 'GET', function(err, body, statusCode, headers) {
 
 				if (err) {
 					return console.log('Failure', err);
-				}
-				console.log("get price........")
-					//body也不规范，需要先转化好	    
+				}				
+				//body也不规范，需要先转化好	    
 				var series = (JSON.parse(body)).series;				
-
 				//如果小区有房价
 				if (series.length != 0) {
 
 					var prices = series[0].data;
 
 					for (i in prices) {
-
+						
 						var zonePrice = new ZonePrice({
 							zone: pZone._id,
 							time: prices[i][0],
@@ -123,30 +171,59 @@ var getPriceAndSave = function(pZone) {
 		
 } //getpriceandsave
 
-
+//生成房价的基础数据
 router.get('/genFangPrice',function(req,res){
-	
-	
-	
+			
 	Zone.find({},function(err, zones){
-		
-		console.log("find zone......");
-		
+						
 		zones.forEach(function(pZone){
 			  		
 		   getPriceAndSave(pZone);
-		
-		
-					
-				
-			  
-		//request库得不到数据， http库直接报错，初步判断原因是header头不规范。需要将url中的中文进行转义，转义完毕后才可以访问。
-			  	;			  				  					
+				  				  					
 		})// for each
 		
 
 	})
 	
+})
+
+//生成房价的差额数据
+router.get('/genPriceChange', function(req,res){
+
+	
+	Zone.find({},function(err, zones){
+						
+		zones.forEach(function(pZone){
+         
+		  ZonePrice.find({"zone":pZone}).exec(function(err,zoneprices){
+		  	  var length = zoneprices.length;
+		      if( length != 0){
+	       	  	 //求出平均上涨率
+	       	  	 var max =0;
+	       	  	 var min =0;
+	       	  	 //获取最大最小值
+	       	  	 zoneprices.forEach(function(zoneprice){
+	       	  	 	(zoneprice.price > max)?max=zoneprice.price:null;
+	       	  	 	(zoneprice.price < min)?min=zoneprice.price:null;
+	       	  	 	
+	       	  	 });
+	       	  	 
+	       	  	 var priceRate = (max-min)/length;
+	             //保存到zone表
+	             console.log("priceRate........",priceRate);
+		  	     pZone.priceRate =priceRate;
+		  	     pZone.save(function(err){
+		  	     	if(err!=null) consoel.log("save zone error...",err);
+		  	     	console.log("update zone.........");
+		  	     })
+		  	     
+		  	     
+     		  }
+
+		  })
+				  				  					
+		})// for each		
+	})
 })
 
 

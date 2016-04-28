@@ -4,6 +4,8 @@
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />  
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
 <title>Hello, World</title>  
+<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css" />
+
 <style type="text/css">  
 html{height:100%}  
 body{height:100%;margin:0px;padding:0px}  
@@ -13,8 +15,12 @@ body{height:100%;margin:0px;padding:0px}
 //v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
 //v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"
 </script>
-<script type="text/javascript" src="/javascripts/index.js"></script>
+
 <script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+
+<script type="text/javascript" src="/javascripts/main.js"></script>
+
+
 </head>  
  
 <body>  
@@ -24,6 +30,8 @@ body{height:100%;margin:0px;padding:0px}
 
 <button type="submit" id="testBtn">生成所有小区</button>	
 <button type="submit" id="genPrice">生成小区房价</button>
+<button id="priceChange">生成房价排名</button>
+<button id="priceTest">测试房价数据</button>
 
 <button type="submit" id="testXy">测试经纬度</button>
 
@@ -35,10 +43,31 @@ body{height:100%;margin:0px;padding:0px}
   })
   
   $("#genPrice").click(function(){
-  	console.log("price click..");
+  
   	$.get("genFangPrice",function(data){
   		console.log(data);
   	});
+  })
+  
+  
+  $("#priceChange").click(function(){
+     
+    $.get("genPriceChange",function(data){
+  		console.log(data);
+  	});
+  })
+  
+  
+  $("#priceTest").click(function(){
+  	
+  	console.log("price test");
+    $.post("getZoneByPrice",
+           {"pageNum":1},
+           function(data){
+           	console.log(data);
+           }
+    )
+  	
   })
   
   
@@ -77,8 +106,17 @@ body{height:100%;margin:0px;padding:0px}
 
  
 </script>
+
+<div class="col-md-3">
+	<p>sth...</p>
+	<ul id="zoneList">
+		
+	</ul>
 	
-<div id="container"></div> 
+	
+</div>
+<div class="col-md-9" id="container"></div>
+
 <script type="text/javascript"> 
 
 
@@ -161,5 +199,7 @@ map.addOverlay(mySquare);
 
 
 </script>  
+
+<!--<script type="application/javascript" src="public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
 </body>  
 </html>
