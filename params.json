@@ -1,0 +1,6 @@
+{
+  "name": "Fkestate",
+  "tagline": "mongoose 使用笔记",
+  "body": "1 populate, 用于连接查询，筛选查询出的子元素。注意，是先进行主查询，然后在主查询中再进行筛选\r\ne.g\r\nZonePrice.find({})\r\n\t.populate({\r\n\t\t  path:'zone',\r\n\t\t  match:{priceRate:{$gt:0}},\r\n\t\t  options:{\r\n\t\t\t  limit:pageSize,\r\n\t\t\t skip:(pageNum-1)*pageSize\r\n\t\t\t}\r\n\t\t\t \t\r\n\t\t})\r\n是先查询出所有的zoneprice记录，然后再在zoneprice记录中筛选符合条件的zone记录\t\t \r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
