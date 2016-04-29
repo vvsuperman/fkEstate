@@ -5,8 +5,8 @@ var ZoneSchema = new mongoose.Schema({
 	city: String ,     //城市
 	district: String,  //行政区域，浦东
 	name: String,      //小区名字
-	x: String,         //百度地图经度
-    y: String,	       //百度地图纬度
+	x: Number,         //百度地图经度
+    y: Number,	       //百度地图纬度
     priceRate:Number,     //房价增加速率
     zonePrices:[],
 	

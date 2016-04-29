@@ -16,9 +16,7 @@ body{height:100%;margin:0px;padding:0px}
 //v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"
 </script>
 
-<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
 
-<script type="text/javascript" src="/javascripts/main.js"></script>
 
 
 </head>  
@@ -35,77 +33,8 @@ body{height:100%;margin:0px;padding:0px}
 
 <button type="submit" id="testXy">测试经纬度</button>
 
-<script type="text/javascript">
-  $("#testBtn").click(function(){
-  	  $.get("genFangData",function(data){
-  	  	console.log(data);
-  	  });
-  })
-  
-  $("#genPrice").click(function(){
-  
-  	$.get("genFangPrice",function(data){
-  		console.log(data);
-  	});
-  })
-  
-  
-  $("#priceChange").click(function(){
-     
-    $.get("genPriceChange",function(data){
-  		console.log(data);
-  	});
-  })
-  
-  
-  $("#priceTest").click(function(){
-  	
-  	console.log("price test");
-    $.post("getZoneByPrice",
-           {"pageNum":1},
-           function(data){
-           	console.log(data);
-           }
-    )
-  	
-  })
-  
-  
- 
-  
-  
-  
-  $("#testXy").click(function(){
-  	var options = {      
-      onSearchComplete: function(results){      
-          if (local.getStatus() == BMAP_STATUS_SUCCESS){      
-                // 判断状态是否正确      
-                    
-//              for (var i = 0; i < results.getCurrentNumPois(); i ++){      
-//                  s.push(results.getPoi(i).title + ", " + results.getPoi(i).address);
-//                  console.log(s);
-//              }      
-                var x = results.getPoi(0).point.lat;
-                var y = results.getPoi(0).point.lng;
-                var point = new BMap.Point(y, x);  
-                var marker = new BMap.Marker(point);        // 创建标注    
-			    map.addOverlay(marker);                     // 将标注添加到地图中 
-                map.centerAndZoom(point,15);
-               
-                 
-          }      
-      }      
- 	}; 
- 	
- 	var local = new BMap.LocalSearch(map, options);      
-	local.search("建新小区");
-  	
-  })
-  
-       
+<button type="submit" id="modifyXy">修改XY</button>
 
- 
-</script>
 
 <div class="col-md-3">
 	<p>sth...</p>
@@ -201,5 +130,10 @@ map.addOverlay(mySquare);
 </script>  
 
 <!--<script type="application/javascript" src="public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
+<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+
+<script type="text/javascript" src="/javascripts/main.js"></script>
+
+
 </body>  
 </html>

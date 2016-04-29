@@ -1,0 +1,289 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />  
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
+<title>Hello, World</title>  
+<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css" />
+
+<style type="text/css">  
+html{height:100%}  
+body{height:100%;margin:0px;padding:0px}  
+#container{height:100%}  
+</style>  
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=IOapgY5U93CMpydPj36kpLtr">
+//v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
+//v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"
+</script>
+
+<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+
+<script type="text/javascript" src="/javascripts/main.js"></script>
+
+
+</head>  
+ 
+<body>  
+	
+	
+
+
+<button type="submit" id="testBtn">生成所有小区</button>	
+<button type="submit" id="genPrice">生成小区房价</button>
+<button id="priceChange">生成房价排名</button>
+<button id="priceTest">测试房价数据</button>
+
+<button type="submit" id="testXy">测试经纬度</button>
+
+<script type="text/javascript">
+  $("#testBtn").click(function(){
+  	  $.get("genFangData",function(data){
+  	  	console.log(data);
+  	  });
+  })
+  
+  $("#genPrice").click(function(){
+  
+  	$.get("genFangPrice",function(data){
+  		console.log(data);
+  	});
+  })
+  
+  
+  $("#priceChange").click(function(){
+     
+    $.get("genPriceChange",function(data){
+  		console.log(data);
+  	});
+  })
+  
+  
+  $("#priceTest").click(function(){
+  	
+  	console.log("price test");
+    $.post("getZoneByPrice",
+           {"pageNum":1},
+           function(data){
+           	console.log(data);
+           }
+    )
+  	
+  })
+  
+  
+ 
+  
+  
+  
+  $("#testXy").click(function(){
+  	
+  	var zoneResult=[];
+  	
+  	
+ 	
+ 	
+	
+	//获取所有有价格的小区
+	 $.get("getPricedZone",function(result){
+  		var zones = result.zones;
+  		var length = zones.length;
+//		var length =10;
+  		var countNum =0;
+  		
+  		
+  		
+  		for(var j=0; j<length; ){
+            //每次只执行100个循环
+			setTimeout(getZoneXy(j),j*10);
+	   
+  			j+=100;
+  					
+  		}
+  		
+  		
+  		
+  		
+  		function getZoneXy(num){
+  			var tempLength =0;
+  			if(num+100>length) tempLength=length;
+  			else tempLength=num+100;
+  			//用于返回的数组
+  			var rtZones=[];
+  			
+  			for(var i=num; i<tempLength ; i++){
+  				  			  			
+	  			function getXy(i){
+	  			
+	  				var options = {
+					      onSearchComplete: function(results){      
+					          if (local.getStatus() == BMAP_STATUS_SUCCESS){      
+					                // 判断状态是否正确      
+					                    
+				
+					                var x = results.getPoi(0).point.lat;
+					                var y = results.getPoi(0).point.lng;				                				               
+					                
+//					                rtZones[i].id = zones[i]._id;
+//					                rtZones[i].x = x;
+//					                rtZones[i].y = y;
+					                
+					                var tZone ={};
+					                tZone.id = zones[i]._id;
+					                tZone.x = zones[i].x;
+					                tZone.y = zones[i].y;
+					                
+					                rtZones.push(tZone);
+					                console.log("tZone",zones[i].name);
+	//				                zones[i]["x"] = x;
+	//				                zones[i]["y"]= y;
+						            //取完最后一条记录，进行上传 
+//									if (i+1 == tempLength) {
+//									
+//										$.ajax({
+//											url: 'saveXy',
+//											type: "POST",
+//											data:  rtZones,
+//											contentType: "application/json; charset=utf-8",
+//											dataType: "json",
+//											success: function(data) {
+//												console.log(data)
+//											}
+//										})
+//																							            	
+//						            }
+						             
+	//				                console.log(i,zones[i].name, x,y);
+	//				                var point = new BMap.Point(y, x);  
+	//				                var marker = new BMap.Marker(point);
+	//				                marker.setTitle(zones[i].name);				              
+	//				                // 创建标注
+	//							    map.addOverlay(marker);                     // 将标注添加到地图中 				               				                
+	//				                map.centerAndZoom(point,15);
+					                                               
+					          }      
+					      }      
+					 	}; 
+	  				
+	  				//限制options中i的作用范围
+	  				var local = new BMap.LocalSearch(map, options); 
+	  				return local.search( zones[i].name );
+	  				
+	  			};
+	  			//settimeout的机制,将i做形参
+	  			setTimeout(getXy(i),100*i);	  			  			 			  			 
+  		  }
+  			
+  		}
+  		
+  			  			     
+           
+            
+  	
+  		
+  		
+  	});
+	
+  	
+  })
+  
+       
+
+ 
+</script>
+
+<div class="col-md-3">
+	<p>sth...</p>
+	<ul id="zoneList">
+		
+	</ul>
+	
+	
+</div>
+<div class="col-md-9" id="container"></div>
+
+<script type="text/javascript"> 
+
+
+
+
+map = new BMap.Map("container");          // 创建地图实例  
+// 初始化地图，设置中心点坐标和地图级别  
+map.addControl(new BMap.NavigationControl());    
+map.addControl(new BMap.ScaleControl());    
+map.addControl(new BMap.OverviewMapControl());    
+map.addControl(new BMap.MapTypeControl());    
+map.centerAndZoom("上海",15); 
+// var marker = new BMap.Marker(point);        // 创建标注    
+// map.addOverlay(marker);                     // 将标注添加到地图中 
+
+// marker.addEventListener("click", function(){    
+//  alert("您点击了标注");    
+// });
+
+
+// marker.addEventListener("dragend", function(e){    
+//  alert("当前位置：" + e.point.lng + ", " + e.point.lat);    
+// })
+
+    
+
+
+// 定义自定义覆盖物的构造函数  
+function SquareOverlay(center, length, color){    
+ this._center = center;    
+ this._length = length;    
+ this._color = color;    
+}    
+// 继承API的BMap.Overlay    
+SquareOverlay.prototype = new BMap.Overlay();
+
+// 实现初始化方法  
+SquareOverlay.prototype.initialize = function(map){    
+// 保存map对象实例   
+ this._map = map;        
+ // 创建div元素，作为自定义覆盖物的容器   
+ var div = document.createElement("div");    
+ div.style.position = "absolute";        
+ // 可以根据参数设置元素外观   
+ div.style.width = this._length + "px";    
+ div.style.height = this._length + "px";    
+ div.style.background = this._color;      
+// 将div添加到覆盖物容器中   
+ map.getPanes().markerPane.appendChild(div);      
+// 保存div实例   
+ this._div = div;      
+// 需要将div元素作为方法的返回值，当调用该覆盖物的show、   
+// hide方法，或者对覆盖物进行移除时，API都将操作此元素。   
+ return div;    
+}
+
+// 实现显示方法    
+SquareOverlay.prototype.show = function(){    
+ if (this._div){    
+   this._div.style.display = "";    
+ }    
+}      
+// 实现隐藏方法  
+SquareOverlay.prototype.hide = function(){    
+ if (this._div){    
+   this._div.style.display = "none";    
+ }    
+}
+
+SquareOverlay.prototype.draw = function(){    
+// 根据地理坐标转换为像素坐标，并设置给容器    
+ var position = this._map.pointToOverlayPixel(this._center);    
+ this._div.style.left = position.x - this._length / 2 + "px";    
+ this._div.style.top = position.y - this._length / 2 + "px";    
+}
+
+var mySquare = new SquareOverlay(map.getCenter(), 100, "red");   
+map.addOverlay(mySquare); 
+
+
+
+</script>  
+
+<!--<script type="application/javascript" src="public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
+</body>  
+</html>

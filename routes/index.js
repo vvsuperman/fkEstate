@@ -44,6 +44,28 @@ router.get('/', function(req, res) {
 
 
 
+router.get('/modifyXy',function(req,res){
+	console.log("/modify X Y");
+	var i=0;
+	Zone.find({}).exec( 
+         function(err,zones){  
+         	zones.forEach(function(zone){
+         		console.log(zone.name,i++);
+                zone.x = parseFloat(zone.x);
+                zone.y = parseFloat(zone.y);
+                zone.save(function(err){
+             	   if (err!=null) console.log("save error",err);
+                })
+         		
+         	})
+             
+         }  
+   );
+   
+   res.json({state:0});
+});
+
+
 //根据房价增长率倒序排列小区名
 router.post('/getZoneByPrice',function(req,res){
 	//分页的起始页
@@ -78,16 +100,63 @@ router.post('/getZoneByPrice',function(req,res){
 				        	    });
 					  	}		  		
 		  		})
-	    	   	  })(i)
-	    	   	      
-	    	   	
-	    	   }
-	  	  
-	  	  
-	  	  
-        })
+	    	   	  })(i)	    	   	      	    	   	
+	    	   }	 
+        })	
+})
+
+//上传小区的x,y数据
+
+router.post('/saveXy',function(req,res){
+	console.log('savexy');
+	var zone = req.body.zone;
+	var i=0;
+			
+//	zones.forEach(function(zone){
+		
+
+		Zone.findById(zone._id,function(err,pzone){
+		     
+		  
+			 if(err!=null) console.log("save zone error...",err);	
+			 
+			   pzone.x = zone.x;
+		       pzone.y = zone.y;
+		       pzone.save(function(err, ppzone){
+		       	
+			  		if(err!=null) consoel.log("save zone error...",err);
+			  		console.log("update zones.........x:",ppzone.x);
+			  		res.json({
+			  			state:0,
+			  			zoneX:ppzone.x
+			  		})
+			  		
+		  	})
+			
+		})
+		
+//	})
 	
 })
+
+
+
+//获取所有有房价的小区
+router.get('/getPricedZone',function(req,res){
+	
+	//返回小区名
+	Zone.find({})
+	    .where("priceRate").gt(0)
+	    .select("name _id")
+	    .exec(function(err, zones){
+	    	    res.json({
+				     state:0,
+				     zones:zones
+				        	    	
+			});
+	    })
+})
+
 
 
 router.get('/genFangData',function(req,res){
