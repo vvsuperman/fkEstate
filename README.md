@@ -14,3 +14,18 @@ http://sh.fangjia.com/trend/yearData?defaultCityName={{城市名}}&districtName=
 中文需进行转义：
 http://sh.fangjia.com/trend/yearData?defaultCityName=%E4%B8%8A%E6%B5%B7&districtName=%E9%87%91%E6%9D%A8%E6%96%B0%E6%9D%91&region=%E6%B5%A6%E4%B8%9C&block=&keyword=&__ajax=1# fkEstate
 小区坐标：通过百度地图获得
+
+颜色根据
+7000 3000 2000 1000
+来划分
+
+北京房价url：
+
+获取小区
+http://beijing.anjuke.com/community/chaoyang/p60/ 
+
+价格趋势：
+http://beijing.anjuke.com/ajax/pricetrend/comm?cid=309070
+
+
+

@@ -1,4 +1,125 @@
 
+
+
+map = new BMap.Map("container");          // 创建地图实例  
+// 初始化地图，设置中心点坐标和地图级别  
+map.addControl(new BMap.NavigationControl());    
+map.addControl(new BMap.ScaleControl());    
+map.addControl(new BMap.OverviewMapControl());    
+map.addControl(new BMap.MapTypeControl());    
+map.centerAndZoom("上海",15); 
+
+
+var allOverlays = []; //储存所有的图层
+
+ map.addEventListener('load', function () {
+
+    
+     var bs = map.getBounds();   //获取可视区域
+	 var sw = bs.getSouthWest();   //可视区域左下角
+	 var ne = bs.getNorthEast();   //可视区域右上角
+		 		 
+	 console.log("ne",ne.lng, ne.lat);
+     console.log("sw",  sw.lng, sw.lat); 
+     getMapZones(ne,sw);
+
+});
+
+
+map.addEventListener("dragend", function(){    
+ var center = map.getCenter();    
+ console.log("地图中心点变更为：" + center.lng + ", " + center.lat);    
+ 
+     var bs = map.getBounds();   //获取可视区域
+	 var sw = bs.getSouthWest();   //可视区域左下角
+	 var ne = bs.getNorthEast();   //可视区域右上角
+		 		 
+	 console.log("ne",ne.lng, ne.lat);
+	 console.log("sw",  sw.lng, sw.lat);   
+	 removeLabels(ne, sw);
+	 getMapZones(ne,sw);
+});
+
+
+$("#genBJZone").click(function(){
+	$.get("genBJFangData");
+})
+
+
+//获取当前可见范围的所有小区
+function getMapZones(ne,sw){
+	     var xy = JSON.stringify({"leftX":ne.lat,"leftY":ne.lng,"rightX":sw.lat,"rightY":sw.lng});
+	     
+	     console.log(xy);
+	     $.ajax({
+				url: 'getMapZones',
+				type: "POST",
+				data:  xy,
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function(data) {
+					//生成地图标注
+					makeLabel(data.zones);
+				}
+			})
+	
+}
+
+
+
+//根据返回值生成标注物
+function makeLabel(zones){
+	zones.forEach(function(zone){
+		var point = new BMap.Point(zone.y, zone.x);
+		var mylabel = new BMap.Label(
+			zone.name,
+			{
+				offset:new BMap.Size(-60,-60),
+				position:point
+			}
+			);
+		var fontColor="";
+		
+		if(zone.priceRate >= 4000){
+			fontColor = "red";
+		}else if(zone.priceRate <4000 && zone.priceRate>=2000){
+			fontColor="blue";
+		}else if(zone.priceRate <2000 && zone.priceRate>=1000){
+			fontColor="green";
+		}else{
+			fontColor="black";
+		}
+		
+		
+		
+		mylabel.setStyle({
+			"color":fontColor,
+			"border":"0",
+			"textAlign":"center",
+			"fontSize":"14px",
+			"height":"18px",
+			"width":"100px",
+//			"background-color":"red"
+		});
+		map.addOverlay(mylabel);
+		allOverlays.push(mylabel);
+		
+	});
+	
+}
+
+
+//清除标注
+function removeLabels(ne, sw){
+	
+	
+	allOverlays.forEach(function(label){
+		map.removeOverlay(label);
+	})
+	
+}
+
+
 //根据页数获取小区列表
 function getZones(pageNum){
 	

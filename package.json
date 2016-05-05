@@ -19,7 +19,8 @@
     "morgan": "~1.5.1",
     "request": "~2.67.0",
     "serve-favicon": "~2.2.0",
-    "underscore": "^1.8.2"
+    "underscore": "^1.8.2",
+    "async":"2.0.0-rc.3"
   },
   "description": "利用 express 和 MongoDB 编写的一个简易版的视频小网站",
   "main": "app.js",

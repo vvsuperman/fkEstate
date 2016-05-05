@@ -10,6 +10,8 @@ var http = require("http");
 var ZonePrice = require('../models/zonePrice');
 var unirest = require('unirest');
 var httpinvoke = require('httpinvoke');
+var async = require("async");
+
 var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
 var pageSize = 10; //每页十条记录
@@ -29,6 +31,11 @@ var region =[{"name":"pudong","cname":"浦东","num":34},{"name":"minhang","cnam
 	{"name":"qingpu","cname":"青浦","num":5}];
 	
 	
+var BJRegion = ["chaoyang","haidian","fengtai","dongchenga","xicheng","chongwen","xuanwu",
+"shijingshan","changping","tongzhou","daxing","shunyi","huairou","fangshan",
+"mentougou","miyun","pinggua","yanqing","zhoubiana"]
+	
+
 var district ={"pudong":"浦东","yangpu":"杨浦","minhang":"闵行","xuhui":"徐汇",
                "putuo":"普陀", "changning":"长宁", "jingan":"静安","huangpu":"黄浦","luwan":"卢湾",
                "hongkou":"虹口","zhabei":"闸北","yangpu":"杨浦","baoshan":"宝山",
@@ -44,8 +51,166 @@ router.get('/', function(req, res) {
 
 
 
+function saveBJZone(name,id,district){
+	
+	 	var priceUrl = "http://beijing.anjuke.com/ajax/pricetrend/comm?cid=";
+       	var zone = new Zone({
+			    	city: "Beijing",
+				district: district,
+				name: name,
+		        x:0,
+			    y:0
+		    });
+		    
+	    //保存小区
+	    zone.save(function(error,pZone){
+		    	if (error) console.log(error);
+		    	 console.log("save zone success.......",pZone.name); 
+		    	  //生成小区房价
+		    	  request(priceUrl+id,function(err,response,body){
+			        
+			     if (!err && response.statusCode == 200) {
+			     	
+			        var body =  eval ("(" + body + ")");
+			        console.log("get price success.......",body,"..........",body["comm"]);
+			          	var comms = body["comm"];			          	
+			          	comms.forEach(function(comm){			          		
+			          		for(var i in comm){
+			          		
+			          		    //生成价格
+				    	          	var zonePrice = new ZonePrice({
+									zone: pZone._id,
+									time: i,
+									price: comm[i],
+									district:"Beijing"
+		
+								});
+		
+								zonePrice.save(function(error, pZonePrice) {
+									if (error) console.log(error);		
+								});			          			
+			          		}	     		
+			          	})			          				          	
+			          }
+	       })  					   							    	
+	    });		
+}
+
+
+//对北京的房价进行处理
+function praseBody(body, district,url){
+	
+	 if(typeof(body) == undefined) return false;
+	
+	 body=body.replace(/[\r\n]/g,"");
+	
+	 var reg =/xqlb(.+?)title/g;
+	 var chReg = /[\u4e00-\u9fa5][\u4e00-\u9fa5_0-9_/+]{2,20}/ ;
+	 var numReg = /[0-9]{5,}/  ;
+	 var zones = body.match(reg);
+	 
+	 if(zones!=null && zones.length != 0){
+	 	zones.forEach(function(zone){
+	 			 		
+	 		var name = zone.match(chReg);   //小区名称
+	 		var AJKId = zone.match(numReg);  //小区在安居客的id
+            if(name!=null){
+            	   console.log("name.......",name[0], AJKId[0]);
+          	   saveBJZone(name[0], AJKId[0],district)
+            }
+	 		
+	 	})
+	 }else{
+	 	console.log("not matched",url);
+	 }
+}
+
+
+//生成北京的小区以及房价
+router.get("/genBJFangData",function(req,res){
+	
+	var url = "http://beijing.anjuke.com/community/";
+	var testUrl ="http://beijing.anjuke.com/community/chaoyang/p100/";
+	
+//	request(testUrl,function(err,response,body){
+//        if (!err && response.statusCode == 200) {
+//        	 praseBody(body,'chaoyang');
+//        	 
+//        }
+//	})
+	
+//	BJRegion.forEach(function(region){
+        
+        //不可用for，异步并发太多会被anjuke所屏蔽， 用async模块，并模拟随机事件
+//		var createZones = function(region, count){
+//			
+//			 	 console.log("create zones...............",region, count);
+//				 var rurl =  url+region+"p"+count;
+//				 request(rurl,function(err,response,body){
+//			            console.log("request url...............",rurl);
+//						var zones = praseBody(body,region,rurl);
+//				 };
+//		}
+		
+//		var foo ＝ function(){
+//			
+//			console.log("I am do nothing");
+//			
+//		}
+
+    BJRegion
+		
+		var count = 0;
+
+		async.whilst(
+		    function () { return count < 10; },
+		    function (cb) {
+		        count++;
+		        console.log("count",count);
+                setTimeout(cb,2000);
+		    },
+		    function (err, n) {
+		        // 5 seconds have passed, n = 5
+		        console.log(err,n);
+		    }
+		);
+			
+	res.json({state:0});
+})
+
+
+
+
+//根据屏幕区域获取所有小区
+router.post('/getMapZones',function(req,res){
+	
+	console.log("/getMapZones........");
+	
+	var leftX = req.body.leftX;
+	var leftY = req.body.leftY;
+	var rightX = req.body.rightX;
+	var rightY = req.body.rightY;
+	
+	console.log("/getMapZones........",rightX,leftY,rightX,rightY);
+	
+	Zone.find({})
+	    .where("x").gt(rightX).lt(leftX)
+	    .where("y").gt(rightY).lt(leftY)
+	    .exec(function(err,zones){
+	    	   if(err !=null) console.log("find zone err",err);
+	    	    
+	    	   res.json({
+             	   	  "state":0, 
+             	   	  "zones":zones 
+             	   })
+	    	   
+	    })
+	
+})
+
+
 router.get('/modifyXy',function(req,res){
-	console.log("/modify X Y");
+	
 	var i=0;
 	Zone.find({}).exec( 
          function(err,zones){  
@@ -53,8 +218,10 @@ router.get('/modifyXy',function(req,res){
          		console.log(zone.name,i++);
                 zone.x = parseFloat(zone.x);
                 zone.y = parseFloat(zone.y);
-                zone.save(function(err){
+                zone.save(function(err, zones){
+               	
              	   if (err!=null) console.log("save error",err);
+             	  
                 })
          		
          	})
@@ -156,8 +323,6 @@ router.get('/getPricedZone',function(req,res){
 			});
 	    })
 })
-
-
 
 router.get('/genFangData',function(req,res){
 	

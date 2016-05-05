@@ -8,8 +8,9 @@ var ObjectId = Schema.Types.ObjectId;
 var ZonePriceSchema = new mongoose.Schema({
 	
 	zone:{type:ObjectId, ref:'Zone'},
-	time: Number,      //时间
+	time: String,      //时间
     price: Number,	   //价格
+    district:String,   //区域
 	
 	
 	meta: {
