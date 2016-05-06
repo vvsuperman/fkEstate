@@ -35,17 +35,35 @@ body{height:100%;margin:0px;padding:0px}
 
 <button type="submit" id="modifyXy">修改XY</button>-->
 
-<button type = "submit" id="genBJZone">生成北京小区</button>
+<!--<button type = "submit" id="genBJZone">生成北京小区</button>-->
 
-<div class="col-md-3">
+<!--<div class="col-md-3">
 	<p>sth...</p>
 	<ul id="zoneList">
 		
 	</ul>
 	
 	
+</div>-->
+<div class="col-md-12" id="container"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel"></h4>
+      </div>
+      <div class="modal-body">
+         <canvas id="myChart"></canvas>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="col-md-9" id="container"></div>
 
 <script type="text/javascript"> 
 
@@ -124,9 +142,11 @@ body{height:100%;margin:0px;padding:0px}
 
 </script>  
 
-<!--<script type="application/javascript" src="public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
-<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
 
+
+<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script type="application/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/Chart.bundle.min.js"></script>
 <script type="text/javascript" src="/javascripts/main.js"></script>
 
 

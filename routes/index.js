@@ -142,15 +142,15 @@ router.get("/genBJFangData",function(req,res){
 //	BJRegion.forEach(function(region){
         
         //不可用for，异步并发太多会被anjuke所屏蔽， 用async模块，并模拟随机事件
-//		var createZones = function(region, count){
-//			
-//			 	 console.log("create zones...............",region, count);
-//				 var rurl =  url+region+"p"+count;
-//				 request(rurl,function(err,response,body){
-//			            console.log("request url...............",rurl);
+		var createZones = function(region, count){
+			
+			 	 console.log("create zones...............",region, count);
+				 var rurl =  url+region+"p"+count;
+				 request(rurl,function(err,response,body){
+			            console.log("request url...............",rurl);
 //						var zones = praseBody(body,region,rurl);
-//				 };
-//		}
+				 });
+		}
 		
 //		var foo ＝ function(){
 //			
@@ -158,26 +158,57 @@ router.get("/genBJFangData",function(req,res){
 //			
 //		}
 
-    BJRegion
-		
-		var count = 0;
+    async.forEachSeries(BJRegion,function (region, key, callback){
+    	  
+    	    var count = 0;
+
+ 	    console.log("region.....",region);
 
 		async.whilst(
 		    function () { return count < 10; },
 		    function (cb) {
 		        count++;
+		        createZones(region,count);
 		        console.log("count",count);
-                setTimeout(cb,2000);
-		    },
-		    function (err, n) {
-		        // 5 seconds have passed, n = 5
-		        console.log(err,n);
+                setTimeout(cb,500);
 		    }
-		);
+		    ,
+		    function (err, count) {
+		    	
+		        console.log("err...........",err,count);
+		        
+		        
+		    }
+		); //whilst
+    	
+     });//for eachof
+		
+
 			
 	res.json({state:0});
 })
 
+//根据小区id获取zoneprices
+router.post("/getPrices",function(req,res){
+	
+	var id = req.body.id;
+	var name = req.body.name;
+	
+	console.log("getprices...........",id);
+	
+	 ZonePrice.find({"zone":id})
+	 		  .sort({"time":1})
+	 		  .exec(function(err, zoneprices){
+	  		            	  
+	  		       name;     	  
+  	  			   res.json({
+						     state:0,
+						     name:name,
+						     zoneprices:zoneprices		        	    	
+		        	    });
+					  	  		
+	})
+})
 
 
 

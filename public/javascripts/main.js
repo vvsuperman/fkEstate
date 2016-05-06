@@ -79,6 +79,7 @@ function makeLabel(zones){
 			}
 			);
 		var fontColor="";
+		mylabel.zoneId = zone._id;
 		
 		if(zone.priceRate >= 4000){
 			fontColor = "red";
@@ -96,11 +97,77 @@ function makeLabel(zones){
 			"color":fontColor,
 			"border":"0",
 			"textAlign":"center",
-			"fontSize":"14px",
+			"fontSize":"13px",
 			"height":"18px",
 			"width":"100px",
 //			"background-color":"red"
 		});
+		
+		 mylabel.addEventListener('click',function(){
+                  
+               $.ajax({
+					url: 'getPrices',
+					type: "POST",
+					data: JSON.stringify({"id":this.zoneId,"name":this.content}),
+					contentType: "application/json; charset=utf-8",
+					dataType: "json",
+					success: function(result) {
+						//生成地图标注
+//						var data =  eval ("(" + data + ")");
+						labels =[];
+						data =[];
+						
+						var tempDateTime="";
+						result.zoneprices.forEach(function(price){
+							
+							var date = new Date(Number(price.time));
+							
+							var dateTime = date.getFullYear()+"/"+date.getMonth();
+							
+							if(dateTime != tempDateTime){
+								labels.push(dateTime);
+							    data.push(price.price);
+							    tempDateTime = dateTime;
+							}
+							
+							
+						})
+						
+						$('#myModal').modal();
+						
+						var ctx = $("#myChart");
+						
+						var modalData = {
+							labels : labels,
+							datasets : [
+								{
+									label: "房价曲线",
+//									fillColor : "rgba(51,153,255,0.5)",
+									strokeColor : "rgba(51,153,255,1)",
+//									pointColor : "rgba(51,153,255,1)",
+//									pointStrokeColor : "#CC0000",
+									fill:false,
+									
+									
+									data : data
+								}								
+							]
+						}
+						
+						
+						new Chart(ctx, {
+						    type: 'line',
+						    data: modalData,
+						    options: {
+						        responsive: true
+						    }
+						});
+						
+						$("#myModalLabel").html(result.name);
+					}
+			})
+   	     });
+   	     
 		map.addOverlay(mylabel);
 		allOverlays.push(mylabel);
 		
