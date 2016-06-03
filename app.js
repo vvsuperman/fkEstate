@@ -71,7 +71,7 @@ app.use(function(err, req, res, next) {
     //     error: {}
     // });
 });
-app.listen(8080);
+app.listen(3000);
 
 console.log('Server running at http://localhost:3000');
 
