@@ -34,7 +34,7 @@ ZonePriceSchema.pre('save', function(next) {
 		this.meta.updatedAt = Date.now();
 	}
 
-	console.log("save zonePrice...........");
+	// console.log("save zonePrice...........",this.zone);
 
 	next();
 })

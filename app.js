@@ -71,8 +71,8 @@ app.use(function(err, req, res, next) {
     //     error: {}
     // });
 });
-app.listen(3000);
+app.listen(4000);
 
-console.log('Server running at http://localhost:3000');
+console.log('Server running at http://localhost:4000');
 
 module.exports = app;

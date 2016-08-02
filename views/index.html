@@ -3,12 +3,16 @@
 <head>  
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />  
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
-<title>Hello, World</title>  
+<title>大家一起热炒上海房价吧！</title>  
 <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css" />
 
 <style type="text/css">  
 html{height:100%}  
 body{height:100%;margin:0px;padding:0px}  
+p{text-align: center;}
+tr{font-size: 16px;text-align: center;}
+th{text-align: center;}
+button{top:7.5px;}
 #container{height:100%}  
 </style>  
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=IOapgY5U93CMpydPj36kpLtr">
@@ -34,18 +38,61 @@ body{height:100%;margin:0px;padding:0px}
 <button type="submit" id="testXy">测试经纬度</button>
 
 <button type="submit" id="modifyXy">修改XY</button>-->
+<button type="submit" id="getPricedZone">getPricedZone</button>
 
 <!--<button type = "submit" id="genBJZone">生成北京小区</button>-->
 
-<!--<div class="col-md-3">
-	<p>sth...</p>
-	<ul id="zoneList">
-		
-	</ul>
+<!--导航栏-->
+<nav class = "navbar navbar-inverse navbar-static-top">
+  <!--查找-->
+  <form class = "navbar-form navbar-left" role = "search">
+    <div class='form-group'> 
+      <input type="text" class="form-control" placeholder="小区名称">
+    </div>
+    <button type='submit' class='btn btn-info'>查找</button>
+  </form>
+  
+  <!-- 选择城市 -->
+  <div class='btn-group'>
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    选择城市 <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="#">北京</a></li>
+    <li><a href="#">上海</a></li>
+    <li><a href="#">广州</a></li>
+    <li role="separator" class="divider"></li>
+    <li><a href="#">其他</a></li>
+  </ul>
+  </div>
+
+  <!--用户登录-->
+  <form class='navbar-form navbar-right' role='submit'>
+    <div class='form-group'>
+      <input type='text' class='form-control' placeholder='用户名'>
+    </div>
+    <div class='form-group'>
+      <input type='password' class='form-control' placeholder='密码'>
+    </div>
+    <button type='submit' class='btn btn-danger'>登陆</button>
+  </form>
+
+</nav>
+<div class="col-md-3"; style = "height:100%;overflow:auto">
+  
+  <!--小区信息列表-->
+	<table id = "data" class = 'table table-striped table-hover table-bordered' >
+    <tbody>
+      <tr id = "title">
+        <th>小区名称</th>
+      </tr>
+    </tbody>
+	</table>
 	
 	
-</div>-->
-<div class="col-md-12" id="container"></div>
+</div>  <!--col-md-3 william finish zone list --> 
+
+<div class="col-md-9" id="container"></div>
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -147,8 +194,10 @@ body{height:100%;margin:0px;padding:0px}
 <script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
 <script type="application/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/javascripts/Chart.bundle.min.js"></script>
-<script type="text/javascript" src="/javascripts/main.js"></script>
+<script type="text/javascript" src="/bower_components/async/dist/async.min.js"></script>
 
+
+<script type="text/javascript" src="/javascripts/main.js"></script>
 
 </body>  
 </html>

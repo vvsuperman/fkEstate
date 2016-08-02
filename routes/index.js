@@ -9,6 +9,7 @@ var ZonePrice = require('../models/zonePrice');
 var unirest = require('unirest');
 var httpinvoke = require('httpinvoke');
 var async = require("async");
+var EventEmitter = require('events').EventEmitter;
 
 var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
@@ -22,7 +23,7 @@ var Cat = mongoose.model('Cat', { name: String });
 var priceUrl ="http://sh.fangjia.com/trend/yearData?defaultCityName=上海&block=&keyword=&__ajax=1&districtName=";//=建新小区&region=杨浦
 
 var region =[{"name":"pudong","cname":"浦东","num":34},{"name":"minhang","cname":"闵行","num":14},
-	,{"name":"xuhui","cname":"徐汇","num":16},{"name":"putuo","cname":"普陀","num":10},{"name":"changning","cname":"长宁","num":15},
+	{"name":"xuhui","cname":"徐汇","num":16},{"name":"putuo","cname":"普陀","num":10},{"name":"changning","cname":"长宁","num":15},
 	{"name":"jingan","cname":"静安","num":10},{"name":"huangpu","cname":"黄浦","num":8},{"name":"luwan","cname":"卢湾","num":7},
 	{"name":"hongkou","cname":"虹口","num":14},{"name":"zhabei","cname":"闸北","num":10},{"name":"yangpu","cname":"杨浦","num":14},
 	{"name":"baoshan","cname":"宝山","num":9},{"name":"songjiang","cname":"松江","num":9},{"name":"jiading","cname":"嘉定","num":9},
@@ -40,11 +41,12 @@ var district ={"pudong":"浦东","yangpu":"杨浦","minhang":"闵行","xuhui":"�
  			   "songjiang":"松江","jiading":"嘉定","qingpu":"青浦"};
 
 //服务器mongodb端口号为12345
-mongoose.connect('mongodb://localhost:12345/yoouda');
+mongoose.connect('mongodb://localhost:27017/map');
 
 
 router.get('/', function(req, res) {
 	res.render("index");	
+
 });
 
 
@@ -198,7 +200,6 @@ router.post("/getPrices",function(req,res){
 	 		  .sort({"time":1})
 	 		  .exec(function(err, zoneprices){
 	  		            	  
-	  		       name;     	  
   	  			   res.json({
 						     state:0,
 						     name:name,
@@ -207,6 +208,24 @@ router.post("/getPrices",function(req,res){
 					  	  		
 	})
 })
+
+//获取所有小区
+router.post("/getAll", function(req, res){
+	Zone.find({})
+		.where("priceRate").gt(0)
+		.exec(function(err,zones){
+			if(err !=null){
+				console.log("find zone err",err)
+			};
+	    	    
+    	   res.json({
+         	   	  "state":0, 
+         	   	  "zones":zones 
+         	})
+		})
+})
+
+
 
 
 
@@ -337,62 +356,29 @@ router.post('/saveXy',function(req,res){
 
 //获取所有有房价的小区
 router.get('/getPricedZone',function(req,res){
-	
 	//返回小区名
-	Zone.find({})
-	    .where("priceRate").gt(0)
-	    .select("name _id")
-	    .exec(function(err, zones){
-	    	    res.json({
-				     state:0,
-				     zones:zones
-				        	    	
-			});
-	    })
+	// var x1 = 0;
+	// var x2 = 2000;
+		// Zone.find({ field: { $gt: x1, $lt: x2 } }) //在数据库里找到pricerate大于0的
+		Zone.find({})
+			 .where("priceRate").gt(0)
+			 .select("name _id") //选择其中的name，_id
+			 .skip(14000)
+			 .exec(function(err,zones){
+			 	console.log('zone_length........',zones.length);
+		    		res.json({  //返回了data
+					   state:0,
+					   zones:zones		        	    	
+					});
+
+		})
+		console.log("are u here?") //上面是异步请求，所以这个先触发
+
+	
+	
 })
 
-router.get('/genFangData',function(req,res){
-	
-	
-	
-	//上海所有的行政区			
-	var baseUrl = "http://www.anjuke.com/shanghai/cm/";
-    region.forEach(function(district){
-    	    //区域有分页，循环分页  	 
-	    	for(var i =0 ;i < district.num ;i++){    	   	                                                               
-             (function(pageNum, district){
-             	var url =  baseUrl + district.name +"/p"+pageNum+"/"; 
-             	
-             	request(url, function (error, response, body) {
-               		              
-				    if (!error && response.statusCode == 200) {						    		
-				       var zones = [];
-				       zones =  getZone(body);
-				       zones.forEach(function(zoneName){				       	
-				       	   
-				       	var zone = new Zone({
-							    	city: "Shanghai",
-								district: district.name,
-								name: zoneName,
-						        x:0,
-							    y:0
-						    });
-					
-					    zone.save(function(error,pZone){
-						    	if (error) console.log(error);
-						    	//根据小区名称查询价格
-						  					   						    	
-					    });				       	
-				       });				       
-				    }
-			    });
-             	
-             })(i, district)
-	   
-	    	}    	      	  
-    });//for each
-              	
-})
+
 
 
 var getPriceAndSave = function(pZone) {
@@ -424,6 +410,8 @@ var getPriceAndSave = function(pZone) {
 						zonePrice.save(function(error, pZonePrice) {
 							if (error) console.log(error);
 
+							
+
 						});
 
 					}
@@ -448,44 +436,217 @@ router.get('/genFangPrice',function(req,res){
 	
 })
 
+function toDecimal(x) { 
+      var f = parseFloat(x); 
+      if (isNaN(f)) { 
+        return; 
+      } 
+      f = Math.round(x*100)/100; 
+      return f; 
+    } 
 //生成房价的差额数据
 router.get('/genPriceChange', function(req,res){
-
 	
 	Zone.find({},function(err, zones){
 						
 		zones.forEach(function(pZone){
          
-		  ZonePrice.find({"zone":pZone}).exec(function(err,zoneprices){
-		  	  var length = zoneprices.length;
-		      if( length != 0){
-	       	  	 //求出平均上涨率
-	       	  	 var max =0;
-	       	  	 var min =0;
-	       	  	 //获取最大最小值
-	       	  	 zoneprices.forEach(function(zoneprice){
-	       	  	 	(zoneprice.price > max)?max=zoneprice.price:null;
-	       	  	 	(zoneprice.price < min)?min=zoneprice.price:null;
-	       	  	 	
-	       	  	 });
-	       	  	 
-	       	  	 var priceRate = (max-min)/length;
-	             //保存到zone表
-	             console.log("priceRate........",priceRate);
-		  	     pZone.priceRate =priceRate;
-		  	     pZone.save(function(err){
-		  	     	if(err!=null) consoel.log("save zone error...",err);
-		  	     	console.log("update zone.........");
-		  	     })
-		  	     
-		  	     
-     		  }
+		  	ZonePrice.find({"zone":pZone}).exec(function(err,zoneprices){
+		  	  	var length = zoneprices.length;
+	  	  		if (length != 0) {
+		  	  		var p_now = parseInt(zoneprices[length-1].price);
 
-		  })
-				  				  					
-		})// for each		
+		  	  		if (p_now != 0){
+		  	  			var p_threeM = parseInt(zoneprices[length-3].price);
+			  	  		var p_oneY = parseInt(zoneprices[length-12].price);
+			  	  		var p_threeY = (length < 36)?0:parseInt(zoneprices[length-36].price);
+			  	  		var p_twoY = (length < 24)?0:parseInt(zoneprices[length-24].price);
+
+			  	  		if (p_oneY == 0){
+			  	  			var priceRate = toDecimal((p_now-p_threeM)/p_threeM);
+			  	  			pZone.priceRate = priceRate;
+			  	  			pZone.priceRateOneY = pZone.priceRateTwoY = pZone.priceRateThreeY = 0;
+			  	  			
+			  	  			
+
+			  	  		}
+			  	  		else if(p_twoY == 0){
+			  	  			var priceRate = toDecimal((p_now-p_oneY)/p_oneY);
+			  	  			pZone.priceRate = priceRate;
+			  	  			pZone.priceRateOneY = toDecimal((p_now - p_oneY)/p_oneY);
+			  	  			pZone.priceRateTwoY= pZone.priceRateThreeY = 0;
+			  	  		}
+			  	  		else if(p_threeY ==0){
+			  	  			var priceRate = toDecimal(((p_now-p_oneY)/p_oneY + (p_oneY-p_twoY)/p_twoY) /2);
+			  	  			pZone.priceRate = priceRate;	
+			  	  			pZone.priceRateOneY = toDecimal((p_now - p_oneY)/p_oneY);
+				  	  		pZone.priceRateTwoY = toDecimal((p_now - p_twoY)/p_twoY);
+			  	  			pZone.priceRateThreeY=0
+			  	  		}
+			  	  		else{
+							var priceRate = toDecimal(((p_now-p_oneY)/p_oneY + (p_oneY-p_twoY)/p_twoY + (p_twoY-p_threeY)/p_threeY)/3);
+			  	  			pZone.priceRate = priceRate;
+			  	  			pZone.priceRateOneY = toDecimal((p_now - p_oneY)/p_oneY);
+				  	  		pZone.priceRateTwoY = toDecimal((p_now - p_twoY)/p_twoY);
+				  	  		pZone.priceRateThreeY = toDecimal((p_now - p_threeY)/p_threeY);
+
+			  	  		}	
+
+			  	  		// console.log('pZone.........',pZone);
+			  	  		
+			  	  		pZone.save(function(err){
+			  	  			if (err){
+			  	  				console.log("errrrrrrr......", err);
+			  	  			}
+			  	  			console.log("update zone.........");
+			  	  		});
+		  	  		};
+	  	  		};
+     		});				  				  					
+		})	
 	})
+	res.json({  //返回了data
+		state: 0 	    	
+	});
 })
+
+// 尝试一个新的爬虫方式
+router.get('/fang', function(req, res){
+
+	// //先把网页上所有的小区名称拉下来
+	var baseUrl = 'http://www.anjuke.com/shanghai/cm/';
+	var region_len = region.length;
+	var x = 0;
+	async.whilst(
+		function (){
+			return x < region_len;
+		},
+		function (region_cb){
+			var district_name = region[x].name;
+			var district_cname = region[x].cname;
+			var pagelimit = region[x].num;	
+			var district_URL = baseUrl + district_name + "/"
+			var pageNum = 1;
+
+			async.whilst(
+				function (){
+					return pageNum < pagelimit;
+				},
+				function (page_cb){ //获取每页上的小区＋cid
+					var page_URL = district_URL + "p" + pageNum + "/";
+					request(page_URL, function (error, response, body){
+						if (!error && response.statusCode == 200){
+							var zones = getZone(body);
+							var xq = 0;
+
+							async.whilst(
+							   	function () {
+							   		console.log("pageNum........",pageNum)
+							   		console.log('xq............',xq);
+							   		return xq < zones[0].length;
+							   	},
+							   	function (xqcallback) {
+						   		   var cid = zones[1][xq];
+						       		var name = zones[0][xq];
+
+						       		Zone.find({'cid':cid},function(error, pZone){
+						       			
+
+						       			if(pZone.length != 0 ){
+						       				xq++;
+												console.log("repeated.........");
+												xqcallback();
+						       			}
+				      					
+				      					else{
+
+												var zone = new Zone ({
+								       			city: "shanghai",
+								       			name: name,
+								       			cid: cid,
+								       			district: district_cname,
+								       			x: 0,
+								       			y: 0
+							       			});
+							       			zone.save(function(error, pZone){ //保存zones
+								       			(function(pZone){
+								       				var pricebaseUrl = "http://shanghai.anjuke.com/ajax/pricetrend/comm?cid=";
+														var tempUrl = pricebaseUrl+pZone.get('cid');
+														request(tempUrl, function(error, response, body){
+															if (!error && response.statusCode == 200) {
+																var body =  eval ("(" + body + ")");
+																var comms = body["comm"]
+
+																async.eachSeries(comms,function(comm, commcallback){
+																		for (var t in comm){
+																			var zoneprice = new ZonePrice({
+																				zone: pZone._id,
+																				time: t,
+																				price: comm[t]
+																			});
+																		};
+																		zoneprice.save(function(error, pZonePrice){
+																			//xq++;
+
+																		})
+																		commcallback();
+																	},
+																	function (error) {
+																		//xq++;
+																		xq++;
+													       				xqcallback();
+																	}
+																)																
+															}					    		
+														})
+								       			})(pZone);
+												});	
+				      					}		       						       			
+						       		})				
+							   	},
+							   	function (err) {
+							   		pageNum++;
+							   		//pagecallback();
+							   		page_cb();
+							   	}
+							);
+						}
+					})
+				}
+			)
+		x++;
+		region_cb()			
+		},
+		function (err){
+			
+			console.log(err)
+		}
+	)
+	// var pageNum = 1; // max 198 pages
+	// async.whilst(
+	// 	function () {
+	// 		console.log('pageNum............',pageNum);
+	// 		return pageNum < 35;
+	// 	},
+	// 	function (pagecallback) { //获取每个网页上的小区名称＋cid
+	// 		var url = baseUrl + "p" + pageNum + "/";
+	// 		request(url, function (error, response, body) {   		              
+	// 		   if (!error && response.statusCode == 200) {						    		
+	// 		      var zones = getZone(body)
+	// 		      var xq = 0;
+
+	// 		   
+			  
+	// 		    };
+	// 		});    
+			
+	// 	},
+	// 	function (error){
+	// 		console.log("Page Return Completed!")
+	// 	}
+	// );
+});        
+
 
 
 
@@ -495,10 +656,29 @@ router.get('/genPriceChange', function(req,res){
 	   	var i = body.indexOf("P3");
         var j = body.indexOf("P4");
         var a = body.slice(i, j);
+        
+        //var reg1 = /[\u4e00-\u9fa5]{2,20}\(.*\)/g ;  //匹配所有的中文及数字
+        var reg1 = /[\u4e00-\u9fa5][^\s*|]{2,20}/g ;
+        var arrName = a.match(reg1)
        
-        var reg = /[\u4e00-\u9fa5][\u4e00-\u9fa5_0-9]{2,20}/g ;  //匹配所有的中文及数字
-        return a.match(reg);
+        for (item in arrName){
+          arrName[item] =arrName[item].replace("</a></em>","")
+          arrName[item] =arrName[item].replace("</a></e","")
+        }
+
+        var reg2 = /[0-9]{1,20}/g;
+  		var arrCid = a.match(reg2)
+  		if (arrCid != null){
+  			arrCid = arrCid.slice(1)
+  		}
+
+  		var data = [arrName, arrCid];
+        return (data)
+        //return a.match(reg1);
+
     
 }
+
+
 
 module.exports = router;

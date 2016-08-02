@@ -8,7 +8,11 @@ var ZoneSchema = new mongoose.Schema({
 	x: Number,         //百度地图经度
     y: Number,	       //百度地图纬度
     priceRate:Number,     //房价增加速率
+    priceRateOneY:Number,  //一年上涨率
+    priceRateTwoY:Number,  //两年
+    priceRateThreeY:Number,//三年
     zonePrices:[],
+    cid: String,
 	
 	
 	meta: {
@@ -26,13 +30,16 @@ var ZoneSchema = new mongoose.Schema({
 
 
 ZoneSchema.pre('save', function(next) {
+
+
+	// this.priceRate = this.priceRateThreeY = this.priceRateTwoY = this.priceRateOneY = 0;
 	if (this.isNew) {
 		this.meta.createdAt = this.meta.updatedAt = Date.now();
 	} else {
 		this.meta.updatedAt = Date.now();
 	}
 
-	console.log("save zone...........");
+	console.log("save zone...........",this.name,this.cid);
 
 	next();
 })
