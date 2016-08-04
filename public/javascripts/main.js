@@ -475,15 +475,15 @@ function search_results(data){
 		// console.log(data.rtResults[x])
 		var td1 = data.rtResults[x].name + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + "当前房价:" + " " + "¥" + data.rtResults[x].zonePrices[len].price; 
 		// + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"+ year + "上涨率:" + data.rtResults[x].(year);
-		var _item = $("<li></li>").html(td1).click(function(){
-			var num = ($(this).index()-1)
+		var _item = $("<tr></tr>").html(td1).click(function(){
+			var num = $(this).index()-1
 			//console.log(num)
 			var graph_data = data.rtResults[num];
 			//console.log(data.zones[num])
 			//console.log(graph_data)
 			pop_chart(graph_data._id, graph_data.name);
 		});
-		$('#first').append(_item);
+		$('#results').append(_item);
 	}
 }
 
