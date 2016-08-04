@@ -216,7 +216,7 @@ function getMapZones(ne,sw){
 					});// 排序, 倒序
 
 				//在移动地图时，移除先前产生的table
-				$('tr').not('#title').remove();
+				$('tr').not('#first').remove();
 				// 	生成table
    				for (var x=0; x < data.zones.length; x++){
     				var td1 = data.zones[x].name;
@@ -238,35 +238,21 @@ function getMapZones(ne,sw){
 
 //点击tr弹出曲线图
 function pop_chart(zoneId, content){
-	//console.log(zoneId);
+	// console.logf(content);
 	$.ajax({
-		url: 'getPrices',
-		type: "POST",
-		data: JSON.stringify({"id":zoneId,"name":content}),
-		contentType: "application/json; charset=utf-8",
-		dataType: "json",
-		success: function(result) {
-			//生成地图标注
-//						var data =  eval ("(" + data + ")");
-			labels =[];
-			data =[];
-			
-			var tempDateTime="";
-			// result.zoneprices.forEach(function(price){
-				
-			// 	var date = new Date(Number(price.time));
-				
-			// 	var dateTime = date.getFullYear()+"/"+date.getMonth();
-				
-			// 	if(dateTime != tempDateTime){
-			// 		labels.push(dateTime);
-			// 	    data.push(price.price);
-			// 	    tempDateTime = dateTime;
-			// 	}
-				
-				
-			// })
-			result.zoneprices.forEach(function(price){
+				url: 'getPrices',
+				type: "POST",
+				data: JSON.stringify({"id":zoneId,"name": content}),
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function(result) {
+					//生成地图标注
+	//						var data =  eval ("(" + data + ")");
+					labels =[];
+					data =[];
+					
+					var tempDateTime="";
+					result.zoneprices.forEach(function(price){
 						
 						// var date = new Date(Number(price.time));
 						
@@ -283,40 +269,111 @@ function pop_chart(zoneId, content){
 						
 						
 					})
-			$('#myModal').modal();
-			
-			var ctx = $("#myChart");
-			
-			var modalData = {
-				labels : labels,
-				datasets : [
-					{
-						label: "房价曲线",
-//									fillColor : "rgba(51,153,255,0.5)",
-						strokeColor : "rgba(51,153,255,1)",
-//									pointColor : "rgba(51,153,255,1)",
-//									pointStrokeColor : "#CC0000",
-						fill:false,
-						
-						
-						data : data
-					}								
-				]
-			}
-			
-			
-			new Chart(ctx, {
-			    type: 'line',
-			    data: modalData,
-			    options: {
-			        responsive: true
-			    }
-			});
-			
-			$("#myModalLabel").html(result.name);
-		}
-	})
+					
+					$('#myModal').modal();
+					
+					var ctx = $("#myChart");
+					
+					var modalData = {
+						labels : labels,
+						datasets : [
+							{
+								label: "房价曲线",
+	//									fillColor : "rgba(51,153,255,0.5)",
+								strokeColor : "rgba(51,153,255,1)",
+	//									pointColor : "rgba(51,153,255,1)",
+	//									pointStrokeColor : "#CC0000",
+								fill:false,
+								
+								
+								data : data
+							}								
+						]
+					}
+					
+					
+					new Chart(ctx, {
+					    type: 'line',
+					    data: modalData,
+					    options: {
+					        responsive: true
+					    }
+					});
+					
+					$("#myModalLabel").html(result.name);
+				}
+			})
 }
+
+function pop(zoneId, content){
+	// console.log(content);
+
+	$.ajax({
+				url: 'getPrices',
+				type: "POST",
+				data: JSON.stringify({"id":zoneId,"name": content}),
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function(result) {
+					//生成地图标注
+	//						var data =  eval ("(" + data + ")");
+					labels =[];
+					data =[];
+					
+					var tempDateTime="";
+					result.zoneprices.forEach(function(price){
+						
+						// var date = new Date(Number(price.time));
+						
+						// var dateTime = date.getFullYear()+"/"+date.getMonth();
+						
+						// if(dateTime != tempDateTime){
+						// 	labels.push(dateTime);
+						//     data.push(price.price);
+						//     tempDateTime = dateTime;
+						// }
+						// console.log(price.time, price.price);
+						labels.push(price.time);
+						data.push(price.price);
+						
+						
+					})
+					
+					$('#resultModal').modal();
+					
+					var ctx = $("#resultChart");
+					
+					var modalData = {
+						labels : labels,
+						datasets : [
+							{
+								label: "房价曲线",
+	//									fillColor : "rgba(51,153,255,0.5)",
+								strokeColor : "rgba(51,153,255,1)",
+	//									pointColor : "rgba(51,153,255,1)",
+	//									pointStrokeColor : "#CC0000",
+								fill:false,
+								
+								
+								data : data
+							}								
+						]
+					}
+					
+					
+					new Chart(ctx, {
+					    type: 'line',
+					    data: modalData,
+					    options: {
+					        responsive: true
+					    }
+					});
+					
+					$("#resultModalLabel").html(result.name);
+				}
+			})
+}
+
 
 
 function complexXQLabel (point, text, mouseoverText, fontColor, zone){
@@ -396,7 +453,7 @@ function complexXQLabel (point, text, mouseoverText, fontColor, zone){
 						//     data.push(price.price);
 						//     tempDateTime = dateTime;
 						// }
-						console.log(price.time, price.price);
+						// console.log(price.time, price.price);
 						labels.push(price.time);
 						data.push(price.price);
 						
@@ -464,8 +521,7 @@ function complexXQLabel (point, text, mouseoverText, fontColor, zone){
 //生成复合条件的小区
 function search_results(data){
 	var year = $("#year").val();
-	$('#myModal').modal();
-	$('tr').not('#first').remove();
+	$('#resultModal').modal();
 	// console.log($("#results"))
 	// 	生成table
 	// console.log(data.rtResults)
@@ -481,7 +537,7 @@ function search_results(data){
 			var graph_data = data.rtResults[num];
 			//console.log(data.zones[num])
 			//console.log(graph_data)
-			pop_chart(graph_data._id, graph_data.name);
+			pop(graph_data._id, graph_data.name);
 		});
 		$('#results').append(_item);
 	}
@@ -596,6 +652,8 @@ $("#search").click(function(result){
 	var price = $("#fangPrice").val();
 	var year = $("#year").val();
 	var pricerate = $("#pricerate").val();
+	$('tr').not('#first').remove();
+
 
 
 	// console.log(district, sign, price, year);

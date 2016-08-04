@@ -16,6 +16,8 @@ th{text-align: center;}
 /*div{top:7.5px;}*/
 #listshell{height: 250px; overflow: scroll;}
 li{text-align: center;}
+#nav{top:7.5px;}
+#navtxt{top:11.0px;}
 #container{height:100%}  
 </style>  
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=IOapgY5U93CMpydPj36kpLtr">
@@ -48,10 +50,11 @@ li{text-align: center;}
 <!--导航栏-->
 <nav class = "navbar navbar-inverse navbar-static-top">
   <!-- <form > -->
-     <div class = "col-md-1">
+  <div class = "row">
+     <div class = "col-md-1" id = "nav">
       <h5 class = "text-info">区域选择</h5>
     </div>
-    <div class = "col-md-3">
+    <div class = "col-md-3" id = "nav">
       <select id = "district" class = "form-control">
         <option value="0" name = "district">徐汇</option>
         <option value="1" name = "district">静安区</option>
@@ -70,40 +73,43 @@ li{text-align: center;}
         <option value="14" name = "district">青浦</option>
       </select>    
     </div>
-    <div class = "col-md-1">
+
+    <div class = "col-md-1" id = "nav">
       <h5 class = "text-info">目前房价</h5>
     </div>
-    <div class = "col-md-1">
+
+    <div class = "col-md-1" id = "nav">
       <select id = "sign" class = "form-control">
         <option>></option>
         <option><</option>
       </select>
     </div>
-    <div class="col-md-2">
+
+    <div class="col-md-2" id = "navtxt">
       <input type="text" id="fangPrice" placeholder="0">
     </div>
 
-    <div class = "col-md-1">
+    <div class = "col-md-1" id = "nav">
       <h5 class = "glyphicon glyphicon-menu-up text-danger" aria-hidden="true">上涨率</h5>
     </div>
-    <div class = "col-md-1">
+
+    <div class = "col-md-1" id = "nav">
       <select id = 'year' class = "form-control">
         <option value = "priceRateOneY">一年</option>
         <option value = "priceRateTwoY">二年</option>
         <option value = "priceRateThreeY">三年</option>
       </select>
     </div>
-    <div class = "col-md-1">
+
+    <div class = "col-md-2" id = "navtxt">
       <input type="text" id="pricerate" placeholder="0">
-    </div>
-    <div class = "col-md-1">
       <button class = "btn-danger" type = "submit" id="search">查找</button>
+
     </div> 
-
+  </div> 
   <!-- </form> -->
- 
-
 </nav>
+
 <div class="col-md-3"; style = "height:100%;overflow:auto">
   
   <!--小区信息列表-->
@@ -125,8 +131,29 @@ li{text-align: center;}
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
         <h4 class="modal-title" id="myModalLabel"></h4>
+      </div>
+      <div class="modal-body">
+        <canvas id="myChart"></canvas>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-md-9" id="container"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+        <h4 class="modal-title" id="resultModalLabel"></h4>
       </div>
       
       <div class="modal-body" id = "listshell">
@@ -137,10 +164,9 @@ li{text-align: center;}
             </tr>
           </tbody>
         </table>
-
       </div>
       <div>
-        <canvas id="myChart"></canvas>
+        <canvas id="resultChart"></canvas>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
