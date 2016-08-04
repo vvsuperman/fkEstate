@@ -4,6 +4,8 @@ var mongoose = require('mongoose');
 var underscore = require('underscore');
 var request = require('request');
 var Zone = require('../models/zone');
+var MetaPoint = require('../models/Metapoint');
+
 var http = require("http");
 var ZonePrice = require('../models/zonePrice');
 var unirest = require('unirest');
@@ -16,14 +18,14 @@ var ObjectId = Schema.Types.ObjectId;
 var pageSize = 10; //每页十条记录
 
 
-
+ 
 
 var Cat = mongoose.model('Cat', { name: String });
 
 var priceUrl ="http://sh.fangjia.com/trend/yearData?defaultCityName=上海&block=&keyword=&__ajax=1&districtName=";//=建新小区&region=杨浦
 
 var region =[{"name":"pudong","cname":"浦东","num":34},{"name":"minhang","cname":"闵行","num":14},
-	{"name":"xuhui","cname":"徐汇","num":16},{"name":"putuo","cname":"普陀","num":10},{"name":"changning","cname":"长宁","num":15},
+	{"name":"xuhui","cname":"徐汇","num":20},{"name":"putuo","cname":"普陀","num":10},{"name":"changning","cname":"长宁","num":15},
 	{"name":"jingan","cname":"静安","num":10},{"name":"huangpu","cname":"黄浦","num":8},{"name":"luwan","cname":"卢湾","num":7},
 	{"name":"hongkou","cname":"虹口","num":14},{"name":"zhabei","cname":"闸北","num":10},{"name":"yangpu","cname":"杨浦","num":14},
 	{"name":"baoshan","cname":"宝山","num":9},{"name":"songjiang","cname":"松江","num":9},{"name":"jiading","cname":"嘉定","num":9},
@@ -40,6 +42,11 @@ var district ={"pudong":"浦东","yangpu":"杨浦","minhang":"闵行","xuhui":"�
                "hongkou":"虹口","zhabei":"闸北","yangpu":"杨浦","baoshan":"宝山",
  			   "songjiang":"松江","jiading":"嘉定","qingpu":"青浦"};
 
+
+ 			 
+
+
+
 //服务器mongodb端口号为12345
 mongoose.connect('mongodb://localhost:27017/map');
 
@@ -49,6 +56,60 @@ router.get('/', function(req, res) {
 
 });
 
+router.post("/search", function(req, res){
+	var district = req.body.district;
+	var sign = req.body.sign;
+	var pricerate = req.body.pricerate
+	var pricerateyear = req.body.year;
+	var price = req.body.price;
+	if (sign == ">"){
+		Zone.find({})
+			.where("district").equals(district)
+			.where(pricerateyear).gt(pricerate)
+			.sort(pricerateyear)
+			.exec(function(err, results){	
+				var rtResults=[];
+				for (var i =0; i<results.length;i++){ //返回的小区数量
+					var now = results[i].zonePrices.length - 1;
+					if (now > 0){
+						var price_now = results[i].zonePrices[now].price//现在的价格
+						if (price_now > price){
+							rtResults.push(results[i]);
+						}
+					}				
+				}
+				rtResults = rtResults.reverse()
+				res.json({
+					state: 0,
+					rtResults: rtResults			
+				})
+			})
+	}
+	else {
+		Zone.find({})
+			.where("district").equals(district)
+			.where(pricerateyear).gt(pricerate)
+			.sort(pricerateyear)
+			.exec(function(err, results){	
+				var rtResults=[];
+				for (var i =0; i<results.length;i++){ //返回的小区数量
+					var now = results[i].zonePrices.length - 1;					
+					if (now > 0){
+						var price_now = results[i].zonePrices[now].price//现在的价格
+						if (price_now < price){
+							rtResults.push(results[i]);
+						}
+					}				
+				}
+				rtResults = rtResults.reverse()
+				res.json({
+					state: 0,
+					rtResults: rtResults			
+				})
+			})
+	}
+	
+})
 
 
 function saveBJZone(name,id,district){
@@ -198,8 +259,7 @@ router.post("/getPrices",function(req,res){
 	
 	 ZonePrice.find({"zone":id})
 	 		  .sort({"time":1})
-	 		  .exec(function(err, zoneprices){
-	  		            	  
+	 		  .exec(function(err, zoneprices){	  		            	  
   	  			   res.json({
 						     state:0,
 						     name:name,
@@ -209,21 +269,6 @@ router.post("/getPrices",function(req,res){
 	})
 })
 
-//获取所有小区
-router.post("/getAll", function(req, res){
-	Zone.find({})
-		.where("priceRate").gt(0)
-		.exec(function(err,zones){
-			if(err !=null){
-				console.log("find zone err",err)
-			};
-	    	    
-    	   res.json({
-         	   	  "state":0, 
-         	   	  "zones":zones 
-         	})
-		})
-})
 
 
 
@@ -325,14 +370,10 @@ router.post('/getZoneByPrice',function(req,res){
 router.post('/saveXy',function(req,res){
 	console.log('savexy');
 	var zone = req.body.zone;
-	var i=0;
 			
 //	zones.forEach(function(zone){		
-		Zone.findById(zone._id,function(err,pzone){
-		     
-		  
-			 if(err!=null) console.log("save zone error...",err);	
-			 
+		Zone.findById(zone._id,function(err,pzone){  
+			 if(err!=null) console.log("save zone error...",err);				 
 			   pzone.x = zone.x;
 		       pzone.y = zone.y;
 		       pzone.save(function(err, ppzone){
@@ -351,6 +392,71 @@ router.post('/saveXy',function(req,res){
 //	})
 	
 })
+router.post('/savesub', function(req, res){
+	// console.log(req)
+	var zone1 = req.body.zone;
+	var subwayName = zone1.subwayName
+	MetaPoint.find({'name':subwayName}, function (err, metapoints){ //找数据库里面有没有这个名字	
+		// console.log(subwayName)
+		// console.log(metapoints)
+		// console.log(metapoints.name)	
+		if (metapoints.length == 0){ //如果数组为空，建立新数组
+			// console.log("wsooooooo?")
+			var metapoint = new MetaPoint ({
+		  		name: subwayName,
+		  		x: zone1.x,
+		  		y: zone1.y
+	  		})
+	  		// console.log(zone1._id)
+	  		metapoint.save(function(err, pmetapoint){ //保存地铁信息
+	  			if (err){
+	  				console.log(err)
+	  			}
+	  			Zone.findById(zone1._id, function(err, pzone){
+	  				if (err){
+	  					console.log(err)
+	  				}
+	  				pzone.subway.push(pmetapoint)
+	  				pzone.save(function(err){
+	  					if (err){
+	  						console.log(err)
+	  					}
+	  					res.json({
+	  						state: 0
+	  					})
+	  				})
+	  			})
+	  		})
+	  		// metapoint.save(function(err,pmetapoint){
+	  		// 	if (err){
+	  		// 		console.log(err)
+	  		// 	}
+	  		// 	Zone.findById(zone1._id, function(err,pzone){
+	  		// 		if (err) {
+	  		// 			console.log(err)
+	  		// 		}
+	  		// 		pzone.subway.push(pmetapoint);
+	  				
+	  		// 		pzone.save(err, function(err){
+	  		// 			if (err){
+	  		// 				console.log(err)
+	  		// 			}
+	  		// 			res.json({
+			  // 				state:0
+			  // 			})
+	  		// 		});
+	  		// 	})	
+	  		// })
+		}
+		else {
+			res.json({
+				state: 1
+			})
+				
+		}
+		  	
+	})
+})
 
 
 
@@ -362,17 +468,18 @@ router.get('/getPricedZone',function(req,res){
 		// Zone.find({ field: { $gt: x1, $lt: x2 } }) //在数据库里找到pricerate大于0的
 		Zone.find({})
 			 .where("priceRate").gt(0)
-			 .select("name _id") //选择其中的name，_id
-			 .skip(14000)
+			 // .select("name _id x y") //选择其中的name，_id
+			 .limit(3000)
+			 .skip(11300)
 			 .exec(function(err,zones){
-			 	console.log('zone_length........',zones.length);
+			 	// console.log('zone_length........',zones.length);
 		    		res.json({  //返回了data
 					   state:0,
 					   zones:zones		        	    	
 					});
 
 		})
-		console.log("are u here?") //上面是异步请求，所以这个先触发
+		// console.log("are u here?") //上面是异步请求，所以这个先触发
 
 	
 	
@@ -409,9 +516,7 @@ var getPriceAndSave = function(pZone) {
 
 						zonePrice.save(function(error, pZonePrice) {
 							if (error) console.log(error);
-
 							
-
 						});
 
 					}
@@ -435,6 +540,11 @@ router.get('/genFangPrice',function(req,res){
 	})
 	
 })
+
+
+
+
+
 
 function toDecimal(x) { 
       var f = parseFloat(x); 
@@ -466,9 +576,6 @@ router.get('/genPriceChange', function(req,res){
 			  	  			var priceRate = toDecimal((p_now-p_threeM)/p_threeM);
 			  	  			pZone.priceRate = priceRate;
 			  	  			pZone.priceRateOneY = pZone.priceRateTwoY = pZone.priceRateThreeY = 0;
-			  	  			
-			  	  			
-
 			  	  		}
 			  	  		else if(p_twoY == 0){
 			  	  			var priceRate = toDecimal((p_now-p_oneY)/p_oneY);
@@ -491,9 +598,7 @@ router.get('/genPriceChange', function(req,res){
 				  	  		pZone.priceRateThreeY = toDecimal((p_now - p_threeY)/p_threeY);
 
 			  	  		}	
-
-			  	  		// console.log('pZone.........',pZone);
-			  	  		
+			  	  		// console.log('pZone.........',pZone); 		
 			  	  		pZone.save(function(err){
 			  	  			if (err){
 			  	  				console.log("errrrrrrr......", err);
@@ -537,79 +642,92 @@ router.get('/fang', function(req, res){
 					request(page_URL, function (error, response, body){
 						if (!error && response.statusCode == 200){
 							var zones = getZone(body);
-							var xq = 0;
+							if (zones[0] !== null || zones[0] !== undefined){
+								var xq = 0;
 
-							async.whilst(
-							   	function () {
-							   		console.log("pageNum........",pageNum)
-							   		console.log('xq............',xq);
-							   		return xq < zones[0].length;
-							   	},
-							   	function (xqcallback) {
-						   		   var cid = zones[1][xq];
-						       		var name = zones[0][xq];
+								async.whilst(
+								   	function () {
+								   		console.log("pageNum........",pageNum)
+								   		console.log('xq............',xq);
+								   		return xq < zones[0].length;
+								   	},
+								   	function (xqcallback) {
+							   		   var cid = zones[1][xq];
+							       		var name = zones[0][xq];
 
-						       		Zone.find({'cid':cid},function(error, pZone){
-						       			
+							       		Zone.find({'cid':cid},function(error, pZone){
+							       			
 
-						       			if(pZone.length != 0 ){
-						       				xq++;
-												console.log("repeated.........");
-												xqcallback();
-						       			}
-				      					
-				      					else{
+							       			if(pZone.length != 0 ){
+							       				xq++;
+													console.log("repeated.........");
+													xqcallback();
+							       			}
+					      					
+					      					else{
 
-												var zone = new Zone ({
-								       			city: "shanghai",
-								       			name: name,
-								       			cid: cid,
-								       			district: district_cname,
-								       			x: 0,
-								       			y: 0
-							       			});
-							       			zone.save(function(error, pZone){ //保存zones
-								       			(function(pZone){
-								       				var pricebaseUrl = "http://shanghai.anjuke.com/ajax/pricetrend/comm?cid=";
-														var tempUrl = pricebaseUrl+pZone.get('cid');
-														request(tempUrl, function(error, response, body){
-															if (!error && response.statusCode == 200) {
-																var body =  eval ("(" + body + ")");
-																var comms = body["comm"]
+													var zone = new Zone ({
+									       			city: "shanghai",
+									       			name: name,
+									       			cid: cid,
+									       			district: district_cname,
+									       			x: 0,
+									       			y: 0
+								       			});
+								       			zone.save(function(error, pZone){ //保存zones
+									       			(function(pZone){
+									       				var pricebaseUrl = "http://shanghai.anjuke.com/ajax/pricetrend/comm?cid=";
+															var tempUrl = pricebaseUrl+pZone.get('cid');
+															request(tempUrl, function(error, response, body){
+																if (!error && response.statusCode == 200) {
+																	var body =  eval ("(" + body + ")");
+																	var comms = body["comm"]
 
-																async.eachSeries(comms,function(comm, commcallback){
-																		for (var t in comm){
-																			var zoneprice = new ZonePrice({
-																				zone: pZone._id,
-																				time: t,
-																				price: comm[t]
-																			});
-																		};
-																		zoneprice.save(function(error, pZonePrice){
+																	async.eachSeries(comms,function(comm, commcallback){
+																			for (var t in comm){
+																				var zoneprice = new ZonePrice({
+																					zone: pZone._id,
+																					time: t,
+																					price: comm[t]
+																				});
+																			};
+																			zoneprice.save(function(error, pZonePrice){
+																				pZone.zonePrices.push(pZonePrice);
+																				pZone.save(function(err){
+																					if (err){
+																						console.log(err)
+																					}
+																				})
+
+																			})
+																			commcallback();
+																		},
+																		function (error) {
 																			//xq++;
+																			xq++;
+														       				xqcallback();
+																		}
+																	)																
+																}					    		
+															})
+									       			})(pZone);
+													});	
+					      					}		       						       			
+							       		})				
+								   	},
+								   	function (err) {
+								   		pageNum++;
+								   		//pagecallback();
+								   		page_cb();
+								   	}
+								);
 
-																		})
-																		commcallback();
-																	},
-																	function (error) {
-																		//xq++;
-																		xq++;
-													       				xqcallback();
-																	}
-																)																
-															}					    		
-														})
-								       			})(pZone);
-												});	
-				      					}		       						       			
-						       		})				
-							   	},
-							   	function (err) {
-							   		pageNum++;
-							   		//pagecallback();
-							   		page_cb();
-							   	}
-							);
+							}
+							else{
+								pageNum++;
+								page_cb();
+							}
+							
 						}
 					})
 				}

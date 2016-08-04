@@ -5,12 +5,11 @@ var ObjectId = Schema.Types.ObjectId;
 
 
 
-var ZonePriceSchema = new mongoose.Schema({
-	
-	zone:{type:ObjectId, ref:'Zone'},
-	time: String,      //时间
-    price: Number,	   //价格
-    district:String,   //区域
+var MetapointSchema = new mongoose.Schema({
+
+	name: String,      
+    x: Number,	   
+    y: Number,   
 	
 	
 	meta: {
@@ -27,7 +26,7 @@ var ZonePriceSchema = new mongoose.Schema({
 });
 
 
-ZonePriceSchema.pre('save', function(next) {
+MetapointSchema.pre('save', function(next) {
 	if (this.isNew) {
 		this.meta.createdAt = this.meta.updatedAt = Date.now();
 	} else {
@@ -39,7 +38,7 @@ ZonePriceSchema.pre('save', function(next) {
 	next();
 })
 
-ZonePriceSchema.statics = {
+MetapointSchema.statics = {
 	fetch: function(callback) {
 		return this.find({}).sort('meta.updatedAt').exec(callback);
 	},
@@ -49,4 +48,4 @@ ZonePriceSchema.statics = {
 	}
 }
 
-module.exports = ZonePriceSchema;
+module.exports = MetapointSchema;

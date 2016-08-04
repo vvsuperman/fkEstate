@@ -9,10 +9,12 @@
 <style type="text/css">  
 html{height:100%}  
 body{height:100%;margin:0px;padding:0px}  
-p{text-align: center;}
+h5{text-align: center; top:7.5px;}
 tr{font-size: 16px;text-align: center;}
+ul{font-size: 16px;text-align: center;}
 th{text-align: center;}
-button{top:7.5px;}
+/*div{top:7.5px;}*/
+li{text-align: center;}
 #container{height:100%}  
 </style>  
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=IOapgY5U93CMpydPj36kpLtr">
@@ -38,44 +40,67 @@ button{top:7.5px;}
 <button type="submit" id="testXy">测试经纬度</button>
 
 <button type="submit" id="modifyXy">修改XY</button>-->
-<button type="submit" id="getPricedZone">getPricedZone</button>
-
+<!-- <button type="submit" id="getPricedZone">getPricedZone</button>
+<button type="button" id = "nearbySub">Nearby Subway</button> -->
 <!--<button type = "submit" id="genBJZone">生成北京小区</button>-->
-
+<!-- ["徐汇","静安","浦东新区","杨浦","闵行","普陀区","长宁","黄浦","卢湾","虹口","闸北","宝山","松江","嘉定","青浦"] -->
 <!--导航栏-->
 <nav class = "navbar navbar-inverse navbar-static-top">
-  <!--查找-->
-  <form class = "navbar-form navbar-left" role = "search">
-    <div class='form-group'> 
-      <input type="text" class="form-control" placeholder="小区名称">
+  <!-- <form > -->
+     <div class = "col-md-1">
+      <h5 class = "text-info">区域选择</h5>
     </div>
-    <button type='submit' class='btn btn-info'>查找</button>
-  </form>
-  
-  <!-- 选择城市 -->
-  <div class='btn-group'>
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    选择城市 <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu">
-    <li><a href="#">北京</a></li>
-    <li><a href="#">上海</a></li>
-    <li><a href="#">广州</a></li>
-    <li role="separator" class="divider"></li>
-    <li><a href="#">其他</a></li>
-  </ul>
-  </div>
+    <div class = "col-md-3">
+      <select id = "district" class = "form-control">
+        <option value="0" name = "district">徐汇</option>
+        <option value="1" name = "district">静安区</option>
+        <option value="2" name = "district">浦东新区</option>
+        <option value="3" name = "district">杨浦</option>
+        <option value="4" name = "district">闵行</option>
+        <option value="5" name = "district">普陀</option>
+        <option value="6" name = "district">长宁</option>
+        <option value="7" name = "district">黄浦</option>
+        <option value="8" name = "district">卢湾</option>
+        <option value="9" name = "district">虹口</option>
+        <option value="10" name = "district">闸北</option>
+        <option value="11" name = "district">宝山</option>
+        <option value="12" name = "district">松江</option>
+        <option value="13" name = "district">嘉定</option>
+        <option value="14" name = "district">青浦</option>
+      </select>    
+    </div>
+    <div class = "col-md-1">
+      <h5 class = "text-info">目前房价</h5>
+    </div>
+    <div class = "col-md-1">
+      <select id = "sign" class = "form-control">
+        <option>></option>
+        <option><</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <input type="text" id="fangPrice" placeholder="0">
+    </div>
 
-  <!--用户登录-->
-  <form class='navbar-form navbar-right' role='submit'>
-    <div class='form-group'>
-      <input type='text' class='form-control' placeholder='用户名'>
+    <div class = "col-md-1">
+      <h5 class = "glyphicon glyphicon-menu-up text-danger" aria-hidden="true">上涨率</h5>
     </div>
-    <div class='form-group'>
-      <input type='password' class='form-control' placeholder='密码'>
+    <div class = "col-md-1">
+      <select id = 'year' class = "form-control">
+        <option value = "priceRateOneY">一年</option>
+        <option value = "priceRateTwoY">二年</option>
+        <option value = "priceRateThreeY">三年</option>
+      </select>
     </div>
-    <button type='submit' class='btn btn-danger'>登陆</button>
-  </form>
+    <div class = "col-md-1">
+      <input type="text" id="pricerate" placeholder="0">
+    </div>
+    <div class = "col-md-1">
+      <button class = "btn-danger" type = "submit" id="search">查找</button>
+    </div> 
+
+  <!-- </form> -->
+ 
 
 </nav>
 <div class="col-md-3"; style = "height:100%;overflow:auto">
@@ -103,7 +128,15 @@ button{top:7.5px;}
         <h4 class="modal-title" id="myModalLabel"></h4>
       </div>
       <div class="modal-body">
-         <canvas id="myChart"></canvas>
+        <table id = "results" class = 'table table-striped table-hover table-bordered' >
+          <tbody>
+            <tr id = "first">
+              <th>价格曲线</th>
+                <ul id = "list" >小区名称</ul>
+            </tr>
+          </tbody>
+        </table>
+        <canvas id="myChart"></canvas>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -111,6 +144,8 @@ button{top:7.5px;}
     </div>
   </div>
 </div>
+
+
 
 <script type="text/javascript"> 
 

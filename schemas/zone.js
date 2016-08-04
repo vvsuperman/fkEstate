@@ -1,4 +1,7 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+
+var ObjectId = Schema.Types.ObjectId;
 
 
 var ZoneSchema = new mongoose.Schema({
@@ -7,12 +10,15 @@ var ZoneSchema = new mongoose.Schema({
 	name: String,      //小区名字
 	x: Number,         //百度地图经度
     y: Number,	       //百度地图纬度
+    subwayName: String, //附近地铁站名称
+    subwayDistance: Number, //距离地铁站距离
     priceRate:Number,     //房价增加速率
     priceRateOneY:Number,  //一年上涨率
     priceRateTwoY:Number,  //两年
     priceRateThreeY:Number,//三年
     zonePrices:[],
     cid: String,
+    subway: [ObjectId],
 	
 	
 	meta: {

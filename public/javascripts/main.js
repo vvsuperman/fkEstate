@@ -1,4 +1,4 @@
-
+ 
 
 
 var hotdistrict = ["徐汇","静安","浦东新区","杨浦","闵行","普陀区","长宁","黄浦","卢湾","虹口","闸北","宝山","松江","嘉定","青浦"]
@@ -163,7 +163,7 @@ function Complexlabel(point, text, mouseoverText){
 	    }
 	    div.addEventListener("click", function(){
 	    	myCompOverlay.hide()
-	    	map.centerAndZoom(point,16); 
+	    	map.centerAndZoom(point,17); 
 
 	    })
 
@@ -240,72 +240,87 @@ function getMapZones(ne,sw){
 function pop_chart(zoneId, content){
 	//console.log(zoneId);
 	$.ajax({
-
-					url: 'getPrices',
-					type: "POST",
-					data: JSON.stringify({"id":zoneId,"name":content}),
-					contentType: "application/json; charset=utf-8",
-					dataType: "json",
-					success: function(result) {
-						//生成地图标注
+		url: 'getPrices',
+		type: "POST",
+		data: JSON.stringify({"id":zoneId,"name":content}),
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		success: function(result) {
+			//生成地图标注
 //						var data =  eval ("(" + data + ")");
-						labels =[];
-						data =[];
+			labels =[];
+			data =[];
+			
+			var tempDateTime="";
+			// result.zoneprices.forEach(function(price){
+				
+			// 	var date = new Date(Number(price.time));
+				
+			// 	var dateTime = date.getFullYear()+"/"+date.getMonth();
+				
+			// 	if(dateTime != tempDateTime){
+			// 		labels.push(dateTime);
+			// 	    data.push(price.price);
+			// 	    tempDateTime = dateTime;
+			// 	}
+				
+				
+			// })
+			result.zoneprices.forEach(function(price){
 						
-						var tempDateTime="";
-						result.zoneprices.forEach(function(price){
-							
-							var date = new Date(Number(price.time));
-							
-							var dateTime = date.getFullYear()+"/"+date.getMonth();
-							
-							if(dateTime != tempDateTime){
-								labels.push(dateTime);
-							    data.push(price.price);
-							    tempDateTime = dateTime;
-							}
-							
-							
-						})
+						// var date = new Date(Number(price.time));
 						
-						$('#myModal').modal();
+						// var dateTime = date.getFullYear()+"/"+date.getMonth();
 						
-						var ctx = $("#myChart");
+						// if(dateTime != tempDateTime){
+						// 	labels.push(dateTime);
+						//     data.push(price.price);
+						//     tempDateTime = dateTime;
+						// }
+						// console.log(price.time, price.price);
+						labels.push(price.time);
+						data.push(price.price);
 						
-						var modalData = {
-							labels : labels,
-							datasets : [
-								{
-									label: "房价曲线",
+						
+					})
+			$('#myModal').modal();
+			
+			var ctx = $("#myChart");
+			
+			var modalData = {
+				labels : labels,
+				datasets : [
+					{
+						label: "房价曲线",
 //									fillColor : "rgba(51,153,255,0.5)",
-									strokeColor : "rgba(51,153,255,1)",
+						strokeColor : "rgba(51,153,255,1)",
 //									pointColor : "rgba(51,153,255,1)",
 //									pointStrokeColor : "#CC0000",
-									fill:false,
-									
-									
-									data : data
-								}								
-							]
-						}
+						fill:false,
 						
 						
-						new Chart(ctx, {
-						    type: 'line',
-						    data: modalData,
-						    options: {
-						        responsive: true
-						    }
-						});
-						
-						$("#myModalLabel").html(result.name);
-					}
-			})
+						data : data
+					}								
+				]
+			}
+			
+			
+			new Chart(ctx, {
+			    type: 'line',
+			    data: modalData,
+			    options: {
+			        responsive: true
+			    }
+			});
+			
+			$("#myModalLabel").html(result.name);
+		}
+	})
 }
 
 
-function complexXQLabel (point, text, mouseoverText){
-	function ComplexCustomOverlay(point, text, mouseoverText){
+function complexXQLabel (point, text, mouseoverText, fontColor, zone){
+	function ComplexCustomOverlay(point, text, mouseoverText, fontColor, zone){
       this._point = point;
       this._text = text;
       this._overText = mouseoverText;
@@ -314,16 +329,16 @@ function complexXQLabel (point, text, mouseoverText){
     ComplexCustomOverlay.prototype.initialize = function(map){
 	    this._map = map;
 	    var div = this._div = document.createElement("div");
-	   	div.style = "border-radius:50px; width:20px; height:20px; border:3px solid #666;";
+	   	div.style = "border-radius:30px; width:100px; height:30px; border:3px solid #666;";
 	    div.style.position = "absolute";
 	    div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
-	    div.style.backgroundColor = "#EE5D5B";
+	    div.style.backgroundColor = "#FFFFFF";
 	    // div.style.border = "1px solid #BC3B3A";
-	    div.style.color = "";
+	    div.style.color = fontColor;
 	    div.style.textAlign = "center"
 	    div.style.height = "20px";
 	    div.style.padding = "2px";
-	    div.style.lineHeight = "20px";
+	    div.style.lineHeight = "10px";
 	    div.style.whiteSpace = "nowrap";
 	    div.style.MozUserSelect = "none";
 	    div.style.fontSize = "10px"
@@ -343,21 +358,86 @@ function complexXQLabel (point, text, mouseoverText){
 	    div.appendChild(arrow);
 	     
 	    div.onmouseover = function(){
-	      this.style.backgroundColor = "#6BADCA";
+	      this.style.backgroundColor = "#FFFFFF";
 	      this.style.borderColor = "#0000ff";
 	      this.getElementsByTagName("span")[0].innerHTML = that._overText;
 	      arrow.style.backgroundPosition = "0px -20px";
 	    }
 
 	    div.onmouseout = function(){
-	      this.style.backgroundColor = "#EE5D5B";
-	      this.style.borderColor = "#BC3B3A";
+	      this.style.backgroundColor = "#FFFFFFF";
+	      this.style.borderColor = "#0000ff";
 	      this.getElementsByTagName("span")[0].innerHTML = that._text;
 	      arrow.style.backgroundPosition = "0px 0px";
 	    }
 	    div.addEventListener("click", function(){
-	    	myCompOverlay.hide()
-	    	map.centerAndZoom(point,18); 
+
+		    	$.ajax({
+				url: 'getPrices',
+				type: "POST",
+				data: JSON.stringify({"id":zone._id,"name":zone.name}),
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function(result) {
+					//生成地图标注
+	//						var data =  eval ("(" + data + ")");
+					labels =[];
+					data =[];
+					
+					var tempDateTime="";
+					result.zoneprices.forEach(function(price){
+						
+						// var date = new Date(Number(price.time));
+						
+						// var dateTime = date.getFullYear()+"/"+date.getMonth();
+						
+						// if(dateTime != tempDateTime){
+						// 	labels.push(dateTime);
+						//     data.push(price.price);
+						//     tempDateTime = dateTime;
+						// }
+						console.log(price.time, price.price);
+						labels.push(price.time);
+						data.push(price.price);
+						
+						
+					})
+					
+					$('#myModal').modal();
+					
+					var ctx = $("#myChart");
+					
+					var modalData = {
+						labels : labels,
+						datasets : [
+							{
+								label: "房价曲线",
+	//									fillColor : "rgba(51,153,255,0.5)",
+								strokeColor : "rgba(51,153,255,1)",
+	//									pointColor : "rgba(51,153,255,1)",
+	//									pointStrokeColor : "#CC0000",
+								fill:false,
+								
+								
+								data : data
+							}								
+						]
+					}
+					
+					
+					new Chart(ctx, {
+					    type: 'line',
+					    data: modalData,
+					    options: {
+					        responsive: true
+					    }
+					});
+					
+					$("#myModalLabel").html(result.name);
+				}
+			})
+	    	// myCompOverlay.hide()
+	    	map.centerAndZoom(point,19); 
 
 	    })
 
@@ -376,9 +456,35 @@ function complexXQLabel (point, text, mouseoverText){
       this._div.style.left = pixel.x - parseInt(this._arrow.style.left) + "px";
       this._div.style.top  = pixel.y - 30 + "px";
     }
-	var myCompOverlay = new ComplexCustomOverlay(point, text, mouseoverText);
-	map.addOverlay(myCompOverlay);
-	allOverlays.push(myCompOverlay);
+	var mylabel = new ComplexCustomOverlay(point, text, mouseoverText, fontColor, zone);
+	map.addOverlay(mylabel);
+	allOverlays.push(mylabel);
+}
+
+//生成复合条件的小区
+function search_results(data){
+	var year = $("#year").val();
+	$('#myModal').modal();
+	$('tr').not('#first').remove();
+	// console.log($("#results"))
+	// 	生成table
+	// console.log(data.rtResults)
+	// console.log(data.rtResults.length)
+	for (var x=0; x < data.rtResults.length; x++){
+		var len = data.rtResults[x].zonePrices.length - 1;
+		// console.log(data.rtResults[x])
+		var td1 = data.rtResults[x].name + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + "当前房价:" + " " + "¥" + data.rtResults[x].zonePrices[len].price; 
+		// + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"+ year + "上涨率:" + data.rtResults[x].(year);
+		var _item = $("<li></li>").html(td1).click(function(){
+			var num = ($(this).index()-1)
+			//console.log(num)
+			var graph_data = data.rtResults[num];
+			//console.log(data.zones[num])
+			//console.log(graph_data)
+			pop_chart(graph_data._id, graph_data.name);
+		});
+		$('#first').append(_item);
+	}
 }
 
 //根据返回值生成标注物
@@ -388,126 +494,30 @@ function makeLabel(zones){
 		function (){
 			return x < zones.length;
 		},
-		function (){
-			console.log(zones[x])
+		function (xqcallback){
+			// console.log(zones[x]._id)
+
 			var point = new BMap.Point(zones[x].y, zones[x].x);
 			var mouseoverText = zones[x].name + " " + zones[x].priceRate;
-			var mylabel = complexXQLabel(point, zones[x].name, mouseoverText);
-			// var mymarker = new BMap.Marker(point)
-			// var mylabel = new BMap.Label(
-			// 	zone.name,
-			// 	{
-			// 		offset:new BMap.Size(0,0),
-			// 		position:point
-			// 	}
-			// 	);
-			// var fontColor= "";
-			// mylabel.zoneId = zones[x]._id;
-			
+			var fontColor = ""
 			if(zones[x].priceRate >= 0.5){
-				div.style.fontColor = "red";
-			}else if(zones[x].priceRate <0.5 && zones[x].priceRate>=0.2){
-				div.style.fontColor="blue";
+				fontColor = "red";
+			}else if(zones[x].priceRate < 0.5 && zones[x].priceRate>=0.2){
+				fontColor="blue";
 			}else if(zones[x].priceRate <0.2 && zones[x].priceRate>=0.0){
-				div.style.fontColor="green";
+				fontColor="green";
 			}else{
-				div.style.fontColor="black";
+				fontColor="black";
 			}
 			
-			
-			
-	// 		mylabel.setStyle({
-	// 			"color":fontColor,
-	// 			"border":"0",
-	// 			"textAlign":"center",
-	// 			"fontSize":"13px",
-	// 			"height":"18px",
-	// 			"width":"100px",
-	// //			"background-color":"red"，
-	// 	        "background":"url(images/niu.jpg)"
-	// 		});
-			
-			
-			mylabel.addEventListener('click',function(){
-	                  
-	               $.ajax({
-						url: 'getPrices',
-						type: "POST",
-						data: JSON.stringify({"id":this.zoneId,"name":this.content}),
-						contentType: "application/json; charset=utf-8",
-						dataType: "json",
-						success: function(result) {
-							//生成地图标注
-	//						var data =  eval ("(" + data + ")");
-							labels =[];
-							data =[];
-							
-							var tempDateTime="";
-							result.zoneprices.forEach(function(price){
-								
-								var date = new Date(Number(price.time));
-								
-								var dateTime = date.getFullYear()+"/"+date.getMonth();
-								
-								if(dateTime != tempDateTime){
-									labels.push(dateTime);
-								    data.push(price.price);
-								    tempDateTime = dateTime;
-								}
-								
-								
-							})
-							
-							$('#myModal').modal();
-							
-							var ctx = $("#myChart");
-							
-							var modalData = {
-								labels : labels,
-								datasets : [
-									{
-										label: "房价曲线",
-	//									fillColor : "rgba(51,153,255,0.5)",
-										strokeColor : "rgba(51,153,255,1)",
-	//									pointColor : "rgba(51,153,255,1)",
-	//									pointStrokeColor : "#CC0000",
-										fill:false,
-										
-										
-										data : data
-									}								
-								]
-							}
-							
-							
-							new Chart(ctx, {
-							    type: 'line',
-							    data: modalData,
-							    options: {
-							        responsive: true
-							    }
-							});
-							
-							$("#myModalLabel").html(result.name);
-						}
-				})
-	   	     });
-	   	     
-			map.addOverlay(mylabel);
-			// map.addOverlay(mymarker)
-			// allOverlays.push(mymarker)
-			allOverlays.push(mylabel);
-
+			complexXQLabel(point, zones[x].name, mouseoverText, fontColor, zones[x]);
+			x++;
+			xqcallback();
 		},
 		function (err){
 
 		}
-	)
-	// zones.forEach(function(zone){
-		
-		
-	// });
-	
+	)	
 }
 
 
@@ -574,15 +584,130 @@ function getZones(pageNum){
   })
   
   
+
+
 $("#modifyXy").click(function(){
 	$.get("modifyXy");
 })
   
-  
+$("#search").click(function(result){
+	var district = $("#district").find("option:selected").text();
+	var sign = $("#sign").find("option:selected").text();
+	var price = $("#fangPrice").val();
+	var year = $("#year").val();
+	var pricerate = $("#pricerate").val();
+
+
+	// console.log(district, sign, price, year);
+
+
+	$.ajax ({
+		url: "search",
+		type: "POST",
+		data: JSON.stringify({"district": district, "sign":sign, "price": price, "year": year, "pricerate":pricerate}),
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		success: function(data) {
+			// console.log("success......", data)
+			search_results(data)
+		}
+
+
+	})
+	
+})
+
+
+
+
+
+$("#nearbySub").click(function(){
+	
+	
+
+	$.get("getPricedZone",function(result){ //grabbing all the zones
+
+  		var zones = result.zones;
+
+  		// console.log('results........',result,zones);
+  		var length = zones.length;
+  		var countNum =0;
+  		var zoneNum = 0;
+  		//for(var i=0; i<length; i++){
+  		async.whilst(
+  			function (){
+  				return zoneNum < length;
+  			},
+
+  			function(callback){
+  				// console.log("hi")
+  				var point = new BMap.Point( zones[zoneNum].y, zones[zoneNum].x)
+  				var options = {				    
+				   onSearchComplete: function(results){  //这里是回调
+			      	if (local.getStatus() == BMAP_STATUS_SUCCESS){      
+			         	// 判断状态是否正确      
+			            // console.log(results.wr[0].title)
+			            // console.log(results.wr[0].point.lng)
+			            var wr_len = results.wr.length
+			            for (var x = 0; x< wr_len; x++){
+			            	var sub_info = results.wr[x]
+			            	// console.log(sub_info)
+			            	var name = sub_info.title
+			            	var x = sub_info.point.lat;
+				            var y = sub_info.point.lng;
+				            zones[zoneNum].subwayName = name + "地铁站"
+				            zones[zoneNum].x = x;
+				            zones[zoneNum].y = y;
+				            // console.log("real....", x)
+				            // console.log(zones[zoneNum])
+				           	//subway point
+				           // var sub_point = new BMap.Point(x, y)
+				           // console.log(sub_point)
+								// console.log("countNum........", countNum)
+								// console.log("countNum",countNum,zoneNum);
+								$.ajax({
+									url: "savesub",
+									type: "POST",
+									data: JSON.stringify({"zone":zones[zoneNum]}),
+									contentType: "application/json; charset=utf-8",
+									dataType: "json",
+									success: function(data){
+										// console.log("success.......", data)
+										zoneNum++;
+										console.log(zoneNum)
+										setTimeout(callback, 20);
+									}
+								});
+
+				        }
+			            
+				   	}
+				   	else{
+			         	console.log("百度地图获取地铁错误", zones[zoneNum]);
+			         	zoneNum++;
+						setTimeout(callback, 20);
+			          	
+			        	}
+				   }      
+				};	  				
+  				//限制options中i的作用范围 这里是搜索
+				var local =  new BMap.LocalSearch(map, options);	
+  			    local.searchNearby("地铁站", point, 2000);
+	  			
+  			},
+  			function (err){
+  				console.log(err)
+
+  			}
+  		)	  			     
+ 		
+  	});
+
+}) 
   
 $("#getPricedZone").click(function(){
   		
-  	var zoneResult=[];
+  	// var zoneResult=[];
   	console.log("Dude...")
 
 	
@@ -591,12 +716,12 @@ $("#getPricedZone").click(function(){
 		// if (err){
 		// 	console.log(err)
 		// }
-		console.log("result.......", result)
+		// console.log("result.......", result)
 
 
   		var zones = result.zones;
 
-  		console.log('results........',result,zones);
+  		console.log('results........',zones);
   		var length = zones.length;
   		var countNum =0;
   		var zoneNum = 0;
@@ -613,7 +738,8 @@ $("#getPricedZone").click(function(){
 					    
 					    onSearchComplete: function(results){  //这里是回调
 
-					        if (local.getStatus() == BMAP_STATUS_SUCCESS){      
+					        if (local.getStatus() == BMAP_STATUS_SUCCESS){  
+					        	// console.log(local.getStatus())    
 					            // 判断状态是否正确      
 
 					            var x = results.getPoi(0).point.lat;
@@ -621,7 +747,7 @@ $("#getPricedZone").click(function(){
 					            zones[zoneNum].x = x;
 					            zones[zoneNum].y = y;
 									
-								console.log("countNum",countNum,zoneNum);
+								// console.log("countNum.........",countNum);
 									 
 									
 							    $.ajax({ //这里是保存
@@ -631,9 +757,11 @@ $("#getPricedZone").click(function(){
 									contentType: "application/json; charset=utf-8",
 									dataType: "json",
 									success: function(data) {
-										console.log(zones[zoneNum].name,data);
+										console.log("succes........", countNum);
+										countNum++;
 										zoneNum++;
-										setTimeout(callback, 20);
+										callback()
+										// setTimeout(callback, 20);
 									}
 								})
 
@@ -641,7 +769,9 @@ $("#getPricedZone").click(function(){
 						    else{
 					          	console.log("百度地图获取Xy错误",zones[zoneNum].name, (++countNum));
 					          	zoneNum++;
-								setTimeout(callback, 20);
+					          	countNum++;
+					          	callback();
+								// setTimeout(callback, 20);
 					          	
 					        }
 					      }      
@@ -655,15 +785,14 @@ $("#getPricedZone").click(function(){
 
 					if (pos1 == -1){ //没有"("
 						if (pos2 != -1){ //有“（”
-							return local.search( zones[zoneNum].name.slice(0,pos2) )
+							local.search( zones[zoneNum].name.slice(0, pos2))
 						}	
 						else{
-							return local.search( zones[zoneNum].name )
+							local.search( zones[zoneNum].name)
 						}
-
 					}
 					else {
-						return local.search( zones[zoneNum].name.slice(0,pos1) )						
+							local.search( zones[zoneNum].name.slice(0,pos1))						
 					}
 						  				
 
