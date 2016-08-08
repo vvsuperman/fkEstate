@@ -287,6 +287,7 @@ router.post('/getMapZones',function(req,res){
 	console.log("/getMapZones........",rightX,leftY,rightX,rightY);
 	
 	Zone.find({})
+		.select("name x y priceRate")
 	    .where("x").gt(rightX).lt(leftX)
 	    .where("y").gt(rightY).lt(leftY)
 	    .exec(function(err,zones){
