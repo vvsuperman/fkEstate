@@ -13,12 +13,14 @@ h5{text-align: center; top:7.5px;}
 tr{font-size: 16px;text-align: center;}
 ul{font-size: 16px;text-align: center;}
 th{text-align: center;}
+input{width:70px;}
 /*div{top:7.5px;}*/
 #listshell{height: 250px; overflow: scroll;}
 li{text-align: center;}
 #nav{top:7.5px;}
 #navtxt{top:11.0px;}
-#container{height:100%}  
+#container{height:100%}
+#text{text-align: center; color:red;}  
 </style>  
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=IOapgY5U93CMpydPj36kpLtr">
 //v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
@@ -54,7 +56,7 @@ li{text-align: center;}
      <div class = "col-md-1" id = "nav">
       <h5 class = "text-info">区域选择</h5>
     </div>
-    <div class = "col-md-3" id = "nav">
+    <div class = "col-md-1" id = "nav">
       <select id = "district" class = "form-control">
         <option value="0" name = "district">徐汇</option>
         <option value="1" name = "district">静安区</option>
@@ -85,13 +87,13 @@ li{text-align: center;}
       </select>
     </div>
 
-    <div class="col-md-2" id = "navtxt">
+    <div class="col-md-1" id = "navtxt">
       <input type="text" id="fangPrice" placeholder="0">
     </div>
 
-    <div class = "col-md-1" id = "nav">
+    <!-- <div class = "col-md-1" id = "nav">
       <h5 class = "glyphicon glyphicon-menu-up text-danger" aria-hidden="true">上涨率</h5>
-    </div>
+    </div> -->
 
     <div class = "col-md-1" id = "nav">
       <select id = 'year' class = "form-control">
@@ -101,10 +103,13 @@ li{text-align: center;}
       </select>
     </div>
 
-    <div class = "col-md-2" id = "navtxt">
+    <div class = "col-md-2" id = "nav">
+      <span class = "glyphicon glyphicon-menu-up text-danger" aria-hidden="true">上涨率</span>
       <input type="text" id="pricerate" placeholder="0">
+      <span id = "text">%</span>
+    </div>
+    <div class = "col-md-2" id = "nav">
       <button class = "btn-danger" type = "submit" id="search">查找</button>
-
     </div> 
   </div> 
   <!-- </form> -->

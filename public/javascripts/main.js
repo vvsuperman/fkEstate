@@ -494,7 +494,7 @@ function complexXQLabel (point, text, mouseoverText, fontColor, zone){
 				}
 			})
 	    	// myCompOverlay.hide()
-	    	map.centerAndZoom(point,19); 
+	    	// map.centerAndZoom(point,19); 
 
 	    })
 
@@ -652,6 +652,14 @@ $("#search").click(function(result){
 	var price = $("#fangPrice").val();
 	var year = $("#year").val();
 	var pricerate = $("#pricerate").val();
+	var percent;
+	if (pricerate == ""){
+		percent = 0;
+	}
+	else{
+		percent = pricerate/100
+	} 
+	// console.log(percent)
 	$('tr').not('#first').remove();
 
 
@@ -662,7 +670,7 @@ $("#search").click(function(result){
 	$.ajax ({
 		url: "search",
 		type: "POST",
-		data: JSON.stringify({"district": district, "sign":sign, "price": price, "year": year, "pricerate":pricerate}),
+		data: JSON.stringify({"district": district, "sign":sign, "price": price, "year": year, "pricerate":percent}),
 		contentType: "application/json; charset=utf-8",
 		dataType: "json",
 		success: function(data) {
