@@ -386,7 +386,7 @@ function complexXQLabel (point, text, mouseoverText, fontColor, zone){
     ComplexCustomOverlay.prototype.initialize = function(map){
 	    this._map = map;
 	    var div = this._div = document.createElement("div");
-	   	div.style = "border-radius:30px; width:100px; height:30px; border:3px solid #666;";
+	   	div.style = "border-radius:30px; width:150px; height:30px; border:3px solid #666;";
 	    div.style.position = "absolute";
 	    div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
 	    div.style.backgroundColor = "#FFFFFF";
@@ -554,7 +554,7 @@ function makeLabel(zones){
 			// console.log(zones[x]._id)
 
 			var point = new BMap.Point(zones[x].y, zones[x].x);
-			var mouseoverText = zones[x].name + " " + zones[x].priceRate;
+			var mouseoverText = zones[x].name + " " + zones[x].priceRate*100 + "%";
 			var fontColor = ""
 			if(zones[x].priceRate >= 0.5){
 				fontColor = "red";
@@ -565,7 +565,8 @@ function makeLabel(zones){
 			}else{
 				fontColor="black";
 			}
-			
+			// var percent = zones[x]*100 + "%"
+
 			complexXQLabel(point, zones[x].name, mouseoverText, fontColor, zones[x]);
 			x++;
 			xqcallback();
