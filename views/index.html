@@ -14,7 +14,7 @@ tr{font-size: 16px;text-align: center;}
 ul{font-size: 16px;text-align: center;}
 th{text-align: center;}
 input{width:70px;}
-/*div{top:7.5px;}*/
+canvas{height:700px; width:800px;}
 #listshell{height: 250px; overflow: scroll;}
 li{text-align: center;}
 #nav{top:7.5px;}
@@ -132,18 +132,18 @@ li{text-align: center;}
 <div class="col-md-9" id="container"></div>
 
 <!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
         <h4 class="modal-title" id="myModalLabel"></h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" id = "chart">
         <canvas id="myChart"></canvas>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="clear">Close</button>
       </div>
     </div>
   </div>
@@ -153,7 +153,7 @@ li{text-align: center;}
 <div class="col-md-9" id="container"></div>
 
 <!-- Modal -->
-<div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel">
+<div class="modal" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -174,7 +174,7 @@ li{text-align: center;}
         <canvas id="resultChart"></canvas>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" id = clear>Close</button>
       </div>
     </div>
   </div>
@@ -265,6 +265,7 @@ li{text-align: center;}
 <script type="application/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/javascripts/Chart.bundle.min.js"></script>
 <script type="text/javascript" src="/bower_components/async/dist/async.min.js"></script>
+
 
 
 <script type="text/javascript" src="/javascripts/main.js"></script>
