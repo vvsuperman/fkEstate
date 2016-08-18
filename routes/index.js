@@ -17,6 +17,8 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
 var pageSize = 10; //每页十条记录
 
+var LJ_Zone = require("../models/LJ_zone");
+var LJ_ZoneHouse = require("../models/LJ_ZoneHouse")
 
  
 
@@ -30,6 +32,13 @@ var region =[{"name":"pudong","cname":"浦东","num":34},{"name":"minhang","cnam
 	{"name":"hongkou","cname":"虹口","num":14},{"name":"zhabei","cname":"闸北","num":10},{"name":"yangpu","cname":"杨浦","num":14},
 	{"name":"baoshan","cname":"宝山","num":9},{"name":"songjiang","cname":"松江","num":9},{"name":"jiading","cname":"嘉定","num":9},
 	{"name":"qingpu","cname":"青浦","num":5}];
+
+var new_region =[{"name":"pudongxinqu","cname":"浦东","num":100},{"name":"minhang","cname":"闵行","num":76},
+	{"name":"xuhui","cname":"徐汇","num":100},{"name":"putuo","cname":"普陀","num":52},{"name":"changning","cname":"长宁","num":81},
+	{"name":"jingan","cname":"静安","num":64},{"name":"huangpu","cname":"黄浦","num":100},{"name":"fengxian","cname":"奉贤","num":26},
+	{"name":"hongkou","cname":"虹口","num":72},{"name":"zhabei","cname":"闸北","num":53},{"name":"yangpu","cname":"杨浦","num":71},
+	{"name":"baoshan","cname":"宝山","num":48},{"name":"songjiang","cname":"松江","num":49},{"name":"jiading","cname":"嘉定","num":49},
+	{"name":"qingpu","cname":"青浦","num":33},{"name":"jinshan","cname":"金山","num":20},{"name":"chongming","cname":"崇明","num":11}];
 	
 	
 var BJRegion = ["chaoyang","haidian","fengtai","dongchenga","xicheng","chongwen","xuanwu",
@@ -619,6 +628,7 @@ router.get('/genPriceChange', function(req,res){
 // 尝试一个新的爬虫方式
 router.get('/fang', function(req, res){
 
+
 	// //先把网页上所有的小区名称拉下来
 	var baseUrl = 'http://www.anjuke.com/shanghai/cm/';
 	var region_len = region.length;
@@ -767,6 +777,267 @@ router.get('/fang', function(req, res){
 });        
 
 
+router.get('/fangprice', function(req, res){
+	// //先把网页上所有的小区名称拉下来
+	var baseUrl = "http://sh.lianjia.com/xiaoqu" ;
+	var xq_page = 1;
+	var district_page = 0;
+	async.whilst(
+		function (){
+			return district_page < new_region.length;
+		},
+		function (district_cb){ //行政区循环
+			async.whilst(
+				function (){
+					// console.log(new_region[district_page].num)
+					return xq_page < new_region[district_page]&&new_region[district_page].num;
+				},
+				function(page_cb){ //每个行政区有xq-page页小区
+					var page_URL = baseUrl + "/" + new_region[district_page].name + "/d" + xq_page;		
+					request(page_URL, function(error, response, body){	
+						console.log("小区分页。。。。",page_URL)
+
+						var num = 0;
+						var info = getXQID(body)//拿到小区ID列表，我需要知道我下面需要循坏多少次
+					
+						async.whilst(
+							function (){
+								return num < info.length;
+							},
+							function (xq_cb){ //循环INFO.length次，因为每页上有这么多个小区
+								var xq_URL = baseUrl + "/" + info[num] + ".html"
+								request(xq_URL, function(error, response, body){
+									console.log("小区的网址......", xq_URL, new_region[district_page].cname)
+									var xq_info = getXQINFO(body)//这里拿到了小区的名称和坐标
+									// console.log(xq_info)
+									var xq_amount = getXQAMOUNT(body) //在这里拿到小区里面有多少套房子，下面要做循环
+
+									LJ_Zone.find({"cid":info[num]}, function(error, pZone){
+										if(pZone.length != 0 ){
+											console.log("repeated.........");
+											list_pos++;
+											xq_cb()
+						       			}
+						       			else{
+						       				var lj_zone = new LJ_Zone ({
+												city: "shanghai",
+												district: new_region[district_page].name,
+												name: xq_info[1],
+												cid: info[num],
+												x: xq_info[0][0],
+												y: xq_info[0][1],
+												amount: xq_amount
+											});
+											// console.log(lj_zone)
+											lj_zone.save(function(err, pZone){
+												if (err){console.log("errrrrr......",err)}
+												var base_house_URL = "sh.lianjia.com/ershoufang/"
+												var house_page = 1;
+												var max_house_page = Math.ceil(pZone.amount/20); //分页
+												async.whilst(
+													function (){
+														return house_page < max_house_page;
+													},
+													function (house_cb){
+														var houseURL = "http://"+ base_house_URL + "d" + house_page + "q" + pZone.cid;
+
+														request(houseURL, function(error, response, body){ //进到了小区里面，查看所有房子
+															console.log("house URL......", houseURL)
+
+															var houseINFO = getHouseINFO(body);
+															console.log(houseINFO)
+
+															// console.log(houseINFO)
+															for (var x=0;x<houseINFO[0].length;x++){
+																var lj_zonehouse = new LJ_ZoneHouse ({
+																	LJ_zone: pZone._id,
+																	xq: pZone.name,
+																	name: houseINFO[0][x],
+																	totalprice: houseINFO[1][x],
+																	area: houseINFO[2][x][1],
+																	style: houseINFO[2][x][0],
+																	other: houseINFO[3][x],
+																	averageprice: houseINFO[4][x],
+																	image: houseINFO[5][x],
+																	id: houseINFO[6][x]
+																})
+																console.log(lj_zonehouse)
+																lj_zonehouse.save(function(err, phousezone){
+																	pZone.house.push(phousezone);
+																	pZone.save(function(err){
+																		house_page++;
+																		house_cb();
+																	})
+																})
+															}
+
+
+														})
+													},
+													function (err){
+														num++;
+														xq_cb();
+														
+													}
+												)
+
+											})
+						       			}
+									})
+									
+								})
+
+
+							},
+							function (err){
+								xq_page++;
+								page_cb()
+								
+							}
+						)
+					});
+
+				},
+				function(err){
+					district_page++;
+					district_cb();
+					
+				}
+			)
+
+		},
+		function(err){
+			
+
+		}
+	)
+	
+		
+		
+	
+}); 
+
+function getHouseINFO(body){ //拿到房子ID，总房价，房子样式，平米价，房子名称, 图片url, 房子面积，房子其他信息
+	var	 a = body.replace(/[\r\n]/g,"");
+
+	var reg_imgURL = /data-original=..{100}/g
+	var IMG_URL = body.match(reg_imgURL) //list of IMG URL
+	var house_IMGURL = [];
+	for (var x = 0; x< IMG_URL.length;x++){
+		var url = IMG_URL[x].slice(15)
+		house_IMGURL.push(url)
+	}
+	
+	var reg_houseID = /key=.{10}/g; 
+	var house_ID =[];
+	var houseID = body.match(reg_houseID); //list of house ID
+	for (var x=0;x<houseID.length;x++){
+		var id = houseID[x].slice(7)
+		house_ID.push(id)
+	}
+	
+	var reg_houseTPRICE = /class="num".[0-9]{1,4}/g
+	var L_houseTPRICE = body.match(reg_houseTPRICE)
+	var houseTPRICE = []; //房价总价列表
+	for (var x = 0; x<L_houseTPRICE.length;){
+		var num = L_houseTPRICE[x].slice(12)
+		houseTPRICE.push(num);
+		x = x +2;
+	}
+	var reg_houseSTYLE = /class="con"..{600}/g
+	var reg_chinese =  /[\u4e00-\u9fa5_0-9_][^\s*|]{1,6}/g
+
+	var b = a.match(reg_houseSTYLE)
+	var houseOTHER=[]
+	for (var x =0; x<b.length; x++){
+		var c = b[x].match(reg_chinese)
+		c = c.slice(2,4)
+		houseOTHER.push(c)//房子其他信息
+	}
+	
+	var reg_AVGPRICE = /price-pre..[0-9]{2,10}/g
+	var avgprice = body.match(reg_AVGPRICE)
+	var house_AVGPRICE = [];
+	for (var x =0; x<avgprice.length;x++){
+		var price = avgprice[x].slice(11)
+		house_AVGPRICE.push(price) //平米价格
+
+	}
+
+	var reg_areaSTYLE = /class="laisuzhou"..{500}/g 
+	var boom = a.match(reg_areaSTYLE)
+	var houseAREASTYLE= [];
+	for (var x=0;x<boom.length;x++){
+		var style_pos = boom[x].indexOf("室")
+		var style = boom[x].slice(style_pos-1,style_pos+3)
+		var sth = [];
+		var area_pos = boom[x].indexOf("平")
+		var area_str = boom[x].slice(area_pos-6,area_pos)
+		var area_reg = /[0-9]{1,4}.[0-9]/g
+		var area = area_str.match(area_reg) 
+		// console.log("hihihihihihih, my area!", area)
+		sth.push(style, area[0])
+		// console.log("come, sth", sth)
+		
+		houseAREASTYLE.push(sth); //房间面积，和样式
+	}
+
+	var reg_title = /class="lj-lazy".alt="..{5,20}[\u4e00-\u9fa5_0-9_][^\s*|]{2,20}/g
+	var title = body.match(reg_title)
+	var houseTITLE=[];
+	for (var x=0;x<title.length;x++){
+		var name = title[x].slice(21)
+		houseTITLE.push(name) //所有房子名称拿下
+	}
+	var data = [houseTITLE, houseTPRICE, houseAREASTYLE, houseOTHER, house_AVGPRICE, house_IMGURL, house_ID];
+	return data;
+}
+
+function getXQAMOUNT(body){
+	var reg_amount = /在售二手房..[0-9]{0,3}/g;
+	var a = body.match(reg_amount);
+	var amount = a[0].slice(6);
+	return amount;
+}
+
+function getXQINFO(body){
+	var reg_name = /<h1>..{2,20}[\u4e00-\u9fa5_0-9_][^\s*|]/g
+	var a = body.match(reg_name)
+	name = a[0].slice(4,-5)
+
+	var reg_XY = /xiaoqu=..{50}/g
+	
+	var b = body.match(reg_XY)
+	b = b[0].slice(9)
+	var comma1 = b.indexOf(",")
+	var y = b.slice(0,comma1)
+	b = b.slice(comma1+2)
+	var comma2 = b.indexOf(",")
+	var x = b.slice(0,comma2)
+	var pos = [x, y]
+	var data = [pos, name]
+	return data;
+
+}
+
+function getXQID(body){
+    // var	 come_id=body.replace(/[\r\n]/g,"");
+	// var i = come_id.indexOf("con-box")
+	// var j = come_id.indexOf("page-box house-lst-page-box")
+	// come_id = come_id.slice(i,j)
+  
+    // console.log(body);
+	var reg_id = /key=.{14}/g
+	var id_isthatyou = body.match(reg_id)
+	// console.log(id_isthatyou.length)
+	var data = [];
+	for (var x =0; x<id_isthatyou.length;){
+		var id = id_isthatyou[x].slice(5)
+		data.push(id)
+		x = x+2;
+	}
+	return data;
+}
 
 
 
@@ -777,7 +1048,7 @@ router.get('/fang', function(req, res){
         var a = body.slice(i, j);
         
         //var reg1 = /[\u4e00-\u9fa5]{2,20}\(.*\)/g ;  //匹配所有的中文及数字
-        var reg1 = /[\u4e00-\u9fa5][^\s*|]{2,20}/g ;
+        var reg1 = /[u4e00-u9fa5]{2,20}/g ;
         var arrName = a.match(reg1)
        
         for (item in arrName){
@@ -787,6 +1058,7 @@ router.get('/fang', function(req, res){
 
         var reg2 = /[0-9]{1,20}/g;
   		var arrCid = a.match(reg2)
+  		
   		if (arrCid != null){
   			arrCid = arrCid.slice(1)
   		}

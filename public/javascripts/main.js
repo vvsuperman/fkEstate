@@ -485,7 +485,7 @@ function complexXQLabel (point, text, mouseoverText, fontColor, zone){
 						
 					})
 					// console.log(zone.name, data)
-					console.log(zone.name, labels)
+					// console.log(zone.name, labels)
 
 					$('#myModal').modal();
 					
@@ -580,6 +580,11 @@ function search_results(data){
 		var td1 = data.rtResults[x].name + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + "当前房价:" + " " + "¥" + data.rtResults[x].zonePrices[len].price; 
 		// + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"+ year + "上涨率:" + data.rtResults[x].(year);
 		var _item = $("<tr></tr>").html(td1).click(function(){
+			$("#resultChart").remove()
+			
+			var canvas = document.createElement("canvas")
+			canvas.id = "resultChart"
+			$("#graph").append(canvas)
 			var num = $(this).index()-1
 			//console.log(num)
 			var graph_data = data.rtResults[num];
@@ -688,12 +693,14 @@ function getZones(pageNum){
   	
   })
   
-$("#clear").click(function(btn){
+$("#clear").click(function(){
 	$("#myChart").remove()
 	var canvas = document.createElement("canvas")
 	canvas.id = "myChart"
 	$("#chart").append(canvas)
 })  
+
+
 
 
 $("#modifyXy").click(function(){
