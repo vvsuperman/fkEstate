@@ -204,33 +204,33 @@ function getMapZones(ne,sw){
 			dataType: "json",
 			success: function(data) {
 				//生成地图标注
-
+				console.log(data)
 				//console.log('data........',data);	
-				makeLabel(data.zones);
+				// makeLabel(data.zones);
 
-				//go on.........willion  create list on index.html
+				// //go on.........willion  create list on index.html
 
-				// sort by priceRate
-					data.zones.sort(function(a,b){
-						return b.priceRate - a.priceRate;
-					});// 排序, 倒序
+				// // sort by priceRate
+				// 	data.zones.sort(function(a,b){
+				// 		return b.priceRate - a.priceRate;
+				// 	});// 排序, 倒序
 
-				//在移动地图时，移除先前产生的table
-				$('tr').not('#first').remove();
-				// 	生成table
-   				for (var x=0; x < data.zones.length; x++){
-    				var td1 = data.zones[x].name;
-    				var _item = $("<tr></tr>").html(td1).click(function(){
-    					var num = ($(this).index()-1)
-    					//console.log(num)
-    					var graph_data = data.zones[num];
-    					//console.log(data.zones[num])
-    					//console.log(graph_data)
-    					pop_chart(graph_data._id, graph_data.name);
-    				});
+				// //在移动地图时，移除先前产生的table
+				// $('tr').not('#first').remove();
+				// // 	生成table
+   	// 			for (var x=0; x < data.zones.length; x++){
+    // 				var td1 = data.zones[x].name;
+    // 				var _item = $("<tr></tr>").html(td1).click(function(){
+    // 					var num = ($(this).index()-1)
+    // 					//console.log(num)
+    // 					var graph_data = data.zones[num];
+    // 					//console.log(data.zones[num])
+    // 					//console.log(graph_data)
+    // 					pop_chart(graph_data._id, graph_data.name);
+    // 				});
 
-    				$('#data').append(_item);
-  				 }
+    // 				$('#data').append(_item);
+  		// 		 }
 			 }
 	})
 }

@@ -12,7 +12,12 @@ var LJ_ZoneSchema = new mongoose.Schema({
     y: Number,	       //百度地图纬度
     cid: String,		//小区的ID
     house: [ObjectId], //关联小区内的房子
-    amount: Number		//房子数量
+    amount: Number,		//房子数量
+    total: Number,		//小区总房数量
+    monthchange: Number, //环比上月涨幅
+    yearchange: Number, //环比去年涨幅
+    xqdata: [],
+    zufangnum: Number //租房的数量
 
 	
 });
